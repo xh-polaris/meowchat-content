@@ -1,6 +1,69 @@
 syntax = "proto3";
 
-package collection;
+package cat;
 
 option go_package='./pb';
 
+message Cat {
+  string id = 1;
+  int64 createAt = 2;
+  string age = 3;
+  string communityId = 4;
+  string color = 5;
+  string details = 6;
+  string name = 7;
+  int64 popularity = 8;
+  string sex = 9;
+  int64 status = 10;
+  string area = 11;
+  bool isSnipped = 12;
+  bool isSterilized = 13;
+  repeated string avatars = 14;
+}
+
+message GetManyCatReq {
+  string communityId = 1;
+  int64 count = 2; // 获取的数量
+}
+
+message GetManyCatResp {
+  repeated Cat cats = 1;
+}
+
+message GetCatReq {
+  string communityId = 1;
+}
+
+message GetCatResp {
+  Cat cat = 1;
+}
+
+message AddCatReq {
+  Cat cat = 1;
+}
+
+message AddCatResp {
+  string catId = 1;
+}
+
+message UpdateCatReq {
+  Cat cat = 1;
+}
+
+message UpdateCatResp {
+}
+
+message DeleteCatReq {
+  string catId = 1;
+}
+
+message DeleteCatResp {
+}
+
+service cat {
+  rpc GetManyCat(GetManyCatReq) returns (GetManyCatResp);
+  rpc GetCat(GetCatReq) returns (GetCatResp);
+  rpc AddCat(AddCatReq) returns (AddCatResp);
+  rpc UpdateCat(UpdateCatReq) returns (UpdateCatResp);
+  rpc DeleteCat(DeleteCatReq) returns (DeleteCatResp);
+}
