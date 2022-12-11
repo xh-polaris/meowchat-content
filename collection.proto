@@ -21,28 +21,29 @@ message Cat {
   repeated string avatars = 14;
 }
 
-message GetManyCatReq {
+message ListCatReq {
   string communityId = 1;
   int64 count = 2; // 获取的数量
+  int64 skip=3;//跳过前skip个
 }
 
-message GetManyCatResp {
+message ListCatResp {
   repeated Cat cats = 1;
 }
 
-message GetCatReq {
-  string communityId = 1;
+message RetrieveCatReq {
+  string catId = 1;
 }
 
-message GetCatResp {
+message RetrieveCatResp {
   Cat cat = 1;
 }
 
-message AddCatReq {
+message CreateCatReq {
   Cat cat = 1;
 }
 
-message AddCatResp {
+message CreateCatResp {
   string catId = 1;
 }
 
@@ -60,10 +61,10 @@ message DeleteCatReq {
 message DeleteCatResp {
 }
 
-service cat {
-  rpc GetManyCat(GetManyCatReq) returns (GetManyCatResp);
-  rpc GetCat(GetCatReq) returns (GetCatResp);
-  rpc AddCat(AddCatReq) returns (AddCatResp);
+service collection_rpc{
+  rpc ListCat(ListCatReq) returns (ListCatResp);
+  rpc RetrieveCat(RetrieveCatReq) returns (RetrieveCatResp);
+  rpc CreateCat(CreateCatReq) returns (CreateCatResp);
   rpc UpdateCat(UpdateCatReq) returns (UpdateCatResp);
   rpc DeleteCat(DeleteCatReq) returns (DeleteCatResp);
 }

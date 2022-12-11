@@ -1,6 +1,10 @@
 Name: collection.rpc
 ListenOn: 0.0.0.0:8080
-Etcd:
-  Hosts:
-  - 127.0.0.1:2379
-  Key: collection.rpc
+Mode: dev
+Log:
+  Encoding: plain
+  Level: debug
+Mysql:
+  Datasource: MYSQL_DATASOURCE
+CacheRedis:
+  - Host: $CACHE_HOST
