@@ -16,10 +16,7 @@ func BoolToInt(a bool) int64 {
 	return 0
 }
 func IntToBool(a int64) bool {
-	if a == 1 {
-		return true
-	}
-	return false
+	return a == 1
 }
 
 func TransformPbCat(Cat *model.Cat) *pb.Cat {
