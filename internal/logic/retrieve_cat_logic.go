@@ -33,7 +33,7 @@ func (l *RetrieveCatLogic) RetrieveCat(in *pb.RetrieveCatReq) (*pb.RetrieveCatRe
 	}
 	cat, err := l.svcCtx.CatModel.FindOneValid(l.ctx, id)
 	if err != nil {
-		return nil, errorx.NoSuchCat
+		return nil, errorx.ErrNoSuchCat
 	}
 	return &pb.RetrieveCatResp{Cat: TransformPbCat(cat)}, nil
 }
