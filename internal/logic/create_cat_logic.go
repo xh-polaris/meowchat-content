@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	. "github.com/xh-polaris/meowchat-collection-rpc/internal/common"
+	"github.com/xh-polaris/meowchat-collection-rpc/internal/common/util"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
 	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 
@@ -26,7 +26,7 @@ func NewCreateCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateC
 }
 
 func (l *CreateCatLogic) CreateCat(in *pb.CreateCatReq) (*pb.CreateCatResp, error) {
-	res, err := l.svcCtx.CatModel.Insert(l.ctx, TransformModelCat(in.Cat))
+	res, err := l.svcCtx.CatModel.Insert(l.ctx, util.TransformModelCat(in.Cat))
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/xh-polaris/meowchat-collection-rpc/errorx"
-	. "github.com/xh-polaris/meowchat-collection-rpc/internal/common"
+	"github.com/xh-polaris/meowchat-collection-rpc/internal/common/util"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
 	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 
@@ -35,5 +35,5 @@ func (l *RetrieveCatLogic) RetrieveCat(in *pb.RetrieveCatReq) (*pb.RetrieveCatRe
 	if err != nil {
 		return nil, errorx.ErrNoSuchCat
 	}
-	return &pb.RetrieveCatResp{Cat: TransformPbCat(cat)}, nil
+	return &pb.RetrieveCatResp{Cat: util.TransformPbCat(cat)}, nil
 }

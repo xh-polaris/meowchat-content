@@ -3,7 +3,7 @@ package logic
 import (
 	"context"
 
-	. "github.com/xh-polaris/meowchat-collection-rpc/internal/common"
+	"github.com/xh-polaris/meowchat-collection-rpc/internal/common/util"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
 	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 
@@ -31,7 +31,7 @@ func (l *ListCatLogic) ListCat(in *pb.ListCatReq) (*pb.ListCatResp, error) {
 	}
 	var Cat []*pb.Cat
 	for _, val := range catList {
-		Cat = append(Cat, TransformPbCat(val))
+		Cat = append(Cat, util.TransformPbCat(val))
 	}
 	return &pb.ListCatResp{Cats: Cat}, nil
 }
