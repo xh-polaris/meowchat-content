@@ -5,6 +5,6 @@ Log:
   Encoding: plain
   Level: debug
 Mysql:
-  Datasource: MYSQL_DATASOURCE
+  Datasource: $MYSQL_DATASOURCE
 CacheRedis:
   - Host: $CACHE_HOST

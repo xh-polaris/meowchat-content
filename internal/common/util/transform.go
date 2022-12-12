@@ -45,8 +45,14 @@ func TransformPbCat(Cat *model.Cat) *pb.Cat {
 }
 
 func TransformModelCat(Cat *pb.Cat) *model.Cat {
-	id, _ := strconv.ParseInt(Cat.Id, 10, 64)
-	str, _ := json.Marshal(Cat.Avatars)
+	id, err := strconv.ParseInt(Cat.Id, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	str, err := json.Marshal(Cat.Avatars)
+	if err != nil {
+		panic(err)
+	}
 	return &model.Cat{
 		Id:           id,
 		CreateAt:     time.Unix(Cat.CreateAt, 0),
