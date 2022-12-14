@@ -25,7 +25,11 @@ func NewUpdateCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateC
 }
 
 func (l *UpdateCatLogic) UpdateCat(in *pb.UpdateCatReq) (*pb.UpdateCatResp, error) {
-	err := l.svcCtx.CatModel.Update(l.ctx, util.TransformModelCat(in.Cat))
+	cat, err := util.TransformModelCat(in.Cat)
+	if err != nil {
+		return nil, err
+	}
+	err = l.svcCtx.CatModel.Update(l.ctx, cat)
 	if err != nil {
 		return nil, err
 	}

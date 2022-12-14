@@ -61,7 +61,7 @@ message DeleteCatReq {
 message DeleteCatResp {
 }
 
-service collection_rpc{
+service collection_rpc {
   rpc ListCat(ListCatReq) returns (ListCatResp);
   rpc RetrieveCat(RetrieveCatReq) returns (RetrieveCatResp);
   rpc CreateCat(CreateCatReq) returns (CreateCatResp);

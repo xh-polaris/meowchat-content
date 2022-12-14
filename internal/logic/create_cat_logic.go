@@ -26,7 +26,11 @@ func NewCreateCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateC
 }
 
 func (l *CreateCatLogic) CreateCat(in *pb.CreateCatReq) (*pb.CreateCatResp, error) {
-	res, err := l.svcCtx.CatModel.Insert(l.ctx, util.TransformModelCat(in.Cat))
+	cat, err := util.TransformModelCat(in.Cat)
+	if err != nil {
+		return nil, err
+	}
+	res, err := l.svcCtx.CatModel.Insert(l.ctx, cat)
 	if err != nil {
 		return nil, err
 	}

@@ -39,19 +39,19 @@ func NewCatModel(conn sqlx.SqlConn, c cache.CacheConf) CatModel {
 }
 
 func (m *defaultCatModel) DeleteSoftly(ctx context.Context, id int64) error {
-	meowchatCollectionRpcCatIdKey := fmt.Sprintf("%s%v", cacheMeowchatCollectionRpcCatIdPrefix, id)
+	meowchatCollectionRpcCatIdKey := fmt.Sprintf("%s%v", cacheMeowchatCollectionCatIdPrefix, id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set `is_delete` = true, `delete_at` = ? where `id` = ?", m.table)
+		query := fmt.Sprintf("update %s set `is_deleted` = true, `delete_at` = ? where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, time.Now(), id)
 	}, meowchatCollectionRpcCatIdKey)
 	return err
 }
 
 func (m *defaultCatModel) FindOneValid(ctx context.Context, id int64) (*Cat, error) {
-	meowchatCollectionRpcCatIdKey := fmt.Sprintf("%s%v", cacheMeowchatCollectionRpcCatIdPrefix, id)
+	meowchatCollectionRpcCatIdKey := fmt.Sprintf("%s%v", cacheMeowchatCollectionCatIdPrefix, id)
 	var resp Cat
 	err := m.QueryRowCtx(ctx, &resp, meowchatCollectionRpcCatIdKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
-		query := fmt.Sprintf("select %s from %s where `id` = ? and `is_delete` = false limit 1", catRows, m.table)
+		query := fmt.Sprintf("select %s from %s where `id` = ? and `is_deleted` = false limit 1", catRows, m.table)
 		return conn.QueryRowCtx(ctx, v, query, id)
 	})
 	switch err {
@@ -66,7 +66,7 @@ func (m *defaultCatModel) FindOneValid(ctx context.Context, id int64) (*Cat, err
 
 func (m *defaultCatModel) FindManyValidByCommunityIdValid(ctx context.Context, CommunityId string, skip int64, count int64) ([]*Cat, error) {
 	var resp []*Cat
-	query := fmt.Sprintf("select %s from %s where `community_id` = ? and `is_delete` = 0 limit ?,?", catRows, m.table)
+	query := fmt.Sprintf("select %s from %s where `community_id` = ? and `is_deleted` = 0 limit ?,?", catRows, m.table)
 	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, CommunityId, skip, count)
 	switch err {
 	case nil:
@@ -74,4 +74,13 @@ func (m *defaultCatModel) FindManyValidByCommunityIdValid(ctx context.Context, C
 	default:
 		return nil, err
 	}
+}
+
+func (m *customCatModel) UpdateValid(ctx context.Context, data *Cat) error {
+	meowchatCollectionCatIdKey := fmt.Sprintf("%s%v", cacheMeowchatCollectionCatIdPrefix, data.Id)
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("update %s set %s where `id` = ? and `is_deleted` = false", m.table, catRowsWithPlaceHolder)
+		return conn.ExecCtx(ctx, query, data.Age, data.CommunityId, data.Color, data.Details, data.Name, data.Popularity, data.Sex, data.Status, data.Area, data.IsSnipped, data.IsSterilized, data.Avatars, data.Id)
+	}, meowchatCollectionCatIdKey)
+	return err
 }

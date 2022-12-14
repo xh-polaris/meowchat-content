@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"github.com/xh-polaris/meowchat-collection-rpc/errorx"
 	"strconv"
 	"time"
 
@@ -44,14 +45,18 @@ func TransformPbCat(Cat *model.Cat) *pb.Cat {
 	}
 }
 
-func TransformModelCat(Cat *pb.Cat) *model.Cat {
+func TransformModelCat(Cat *pb.Cat) (*model.Cat, error) {
 	id, err := strconv.ParseInt(Cat.Id, 10, 64)
 	if err != nil {
-		panic(err)
+		if Cat.Id == "" {
+			id = 0
+		} else {
+			return nil, errorx.ErrInvalidId
+		}
 	}
 	str, err := json.Marshal(Cat.Avatars)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return &model.Cat{
 		Id:           id,
@@ -68,5 +73,5 @@ func TransformModelCat(Cat *pb.Cat) *model.Cat {
 		IsSnipped:    BoolToInt(Cat.IsSnipped),
 		IsSterilized: BoolToInt(Cat.IsSterilized),
 		Avatars:      string(str),
-	}
+	}, nil
 }
