@@ -21,6 +21,6 @@ type Cat struct {
 	IsDeleted    bool               `bson:"isDeleted"`
 	Avatars      []string           `bson:"avatars"`
 	DeleteAt     time.Time          `bson:"deleteAt,omitempty"`
-	UpdateAt     time.Time          `bson:"updateAt" json:"updateAt"`
-	CreateAt     time.Time          `bson:"createAt" json:"createAt"`
+	UpdateAt     time.Time          `bson:"updateAt,omitempty" json:"updateAt,omitempty"`
+	CreateAt     time.Time          `bson:"createAt,omitempty" json:"createAt,omitempty"`
 }

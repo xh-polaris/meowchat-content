@@ -61,7 +61,7 @@ func (m *defaultCatModel) FindOne(ctx context.Context, id string) (*Cat, error) 
 func (m *defaultCatModel) Update(ctx context.Context, data *Cat) error {
 	data.UpdateAt = time.Now()
 	key := prefixCatCacheKey + data.ID.Hex()
-	_, err := m.conn.ReplaceOne(ctx, key, bson.M{"_id": data.ID}, data)
+	_, err := m.conn.UpdateOne(ctx, key, bson.M{"_id": data.ID}, bson.M{"$set": data})
 	return err
 }
 
