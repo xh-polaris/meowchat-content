@@ -22,6 +22,11 @@ func NewCollectionRpcServer(svcCtx *svc.ServiceContext) *CollectionRpcServer {
 	}
 }
 
+func (s *CollectionRpcServer) SearchCat(ctx context.Context, in *pb.SearchCatReq) (*pb.SearchCatResp, error) {
+	l := logic.NewSearchCatLogic(ctx, s.svcCtx)
+	return l.SearchCat(in)
+}
+
 func (s *CollectionRpcServer) ListCat(ctx context.Context, in *pb.ListCatReq) (*pb.ListCatResp, error) {
 	l := logic.NewListCatLogic(ctx, s.svcCtx)
 	return l.ListCat(in)

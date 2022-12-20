@@ -22,10 +22,13 @@ type (
 	ListCatResp     = pb.ListCatResp
 	RetrieveCatReq  = pb.RetrieveCatReq
 	RetrieveCatResp = pb.RetrieveCatResp
+	SearchCatReq    = pb.SearchCatReq
+	SearchCatResp   = pb.SearchCatResp
 	UpdateCatReq    = pb.UpdateCatReq
 	UpdateCatResp   = pb.UpdateCatResp
 
 	CollectionRpc interface {
+		SearchCat(ctx context.Context, in *SearchCatReq, opts ...grpc.CallOption) (*SearchCatResp, error)
 		ListCat(ctx context.Context, in *ListCatReq, opts ...grpc.CallOption) (*ListCatResp, error)
 		RetrieveCat(ctx context.Context, in *RetrieveCatReq, opts ...grpc.CallOption) (*RetrieveCatResp, error)
 		CreateCat(ctx context.Context, in *CreateCatReq, opts ...grpc.CallOption) (*CreateCatResp, error)
@@ -42,6 +45,11 @@ func NewCollectionRpc(cli zrpc.Client) CollectionRpc {
 	return &defaultCollectionRpc{
 		cli: cli,
 	}
+}
+
+func (m *defaultCollectionRpc) SearchCat(ctx context.Context, in *SearchCatReq, opts ...grpc.CallOption) (*SearchCatResp, error) {
+	client := pb.NewCollectionRpcClient(m.cli.Conn())
+	return client.SearchCat(ctx, in, opts...)
 }
 
 func (m *defaultCollectionRpc) ListCat(ctx context.Context, in *ListCatReq, opts ...grpc.CallOption) (*ListCatResp, error) {

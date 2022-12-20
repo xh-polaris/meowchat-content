@@ -4,7 +4,13 @@ Mode: dev
 Log:
   Encoding: plain
   Level: debug
-Mysql:
-  Datasource: $MYSQL_DATASOURCE
-CacheRedis:
+Mongo:
+  URL: mongodb://root:password@lh2.xhpolaris.com:30002/?directConnection=true
+  DB: meowchat_collection
+Cache:
   - Host: $CACHE_HOST
+Elasticsearch:
+  Addresses:
+    - https://127.0.0.1:9200
+  Username: elastic
+  Password: password

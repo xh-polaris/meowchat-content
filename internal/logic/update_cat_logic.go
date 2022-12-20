@@ -2,8 +2,11 @@ package logic
 
 import (
 	"context"
+	"github.com/jinzhu/copier"
+	"github.com/xh-polaris/meowchat-collection-rpc/errorx"
+	"github.com/xh-polaris/meowchat-collection-rpc/internal/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"github.com/xh-polaris/meowchat-collection-rpc/internal/common/util"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
 	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 
@@ -25,9 +28,14 @@ func NewUpdateCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateC
 }
 
 func (l *UpdateCatLogic) UpdateCat(in *pb.UpdateCatReq) (*pb.UpdateCatResp, error) {
-	cat, err := util.TransformModelCat(in.Cat)
+	cat := &model.Cat{}
+	err := copier.Copy(cat, in.Cat)
 	if err != nil {
 		return nil, err
+	}
+	cat.ID, err = primitive.ObjectIDFromHex(in.Cat.Id)
+	if err != nil {
+		return nil, errorx.ErrInvalidId
 	}
 	err = l.svcCtx.CatModel.Update(l.ctx, cat)
 	if err != nil {

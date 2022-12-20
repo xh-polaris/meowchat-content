@@ -3,7 +3,6 @@ package svc
 import (
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/config"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/model"
-	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type ServiceContext struct {
@@ -12,9 +11,8 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	conn := sqlx.NewMysql(c.Mysql.Datasource)
 	return &ServiceContext{
 		Config:   c,
-		CatModel: model.NewCatModel(conn, c.CacheRedis),
+		CatModel: model.NewCatModel(c.Mongo.URL, c.Mongo.DB, c.Cache, c.Elasticsearch),
 	}
 }

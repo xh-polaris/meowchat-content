@@ -10,22 +10,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListCatLogic struct {
+type SearchCatLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewListCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListCatLogic {
-	return &ListCatLogic{
+func NewSearchCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SearchCatLogic {
+	return &SearchCatLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *ListCatLogic) ListCat(in *pb.ListCatReq) (*pb.ListCatResp, error) {
-	data, err := l.svcCtx.CatModel.FindManyByCommunityId(l.ctx, in.CommunityId, in.Skip, in.Count)
+func (l *SearchCatLogic) SearchCat(in *pb.SearchCatReq) (*pb.SearchCatResp, error) {
+	data, err := l.svcCtx.CatModel.Search(l.ctx, in.CommunityId, in.Keyword, in.Skip, in.Count)
 	if err != nil {
 		return nil, err
 	}
@@ -40,5 +40,5 @@ func (l *ListCatLogic) ListCat(in *pb.ListCatReq) (*pb.ListCatResp, error) {
 		cat.CreateAt = val.CreateAt.Unix()
 		cats = append(cats, cat)
 	}
-	return &pb.ListCatResp{Cats: cats}, nil
+	return &pb.SearchCatResp{Cats: cats}, nil
 }

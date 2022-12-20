@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CollectionRpcClient interface {
+	SearchCat(ctx context.Context, in *SearchCatReq, opts ...grpc.CallOption) (*SearchCatResp, error)
 	ListCat(ctx context.Context, in *ListCatReq, opts ...grpc.CallOption) (*ListCatResp, error)
 	RetrieveCat(ctx context.Context, in *RetrieveCatReq, opts ...grpc.CallOption) (*RetrieveCatResp, error)
 	CreateCat(ctx context.Context, in *CreateCatReq, opts ...grpc.CallOption) (*CreateCatResp, error)
@@ -35,6 +36,15 @@ type collectionRpcClient struct {
 
 func NewCollectionRpcClient(cc grpc.ClientConnInterface) CollectionRpcClient {
 	return &collectionRpcClient{cc}
+}
+
+func (c *collectionRpcClient) SearchCat(ctx context.Context, in *SearchCatReq, opts ...grpc.CallOption) (*SearchCatResp, error) {
+	out := new(SearchCatResp)
+	err := c.cc.Invoke(ctx, "/cat.collection_rpc/SearchCat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *collectionRpcClient) ListCat(ctx context.Context, in *ListCatReq, opts ...grpc.CallOption) (*ListCatResp, error) {
@@ -86,6 +96,7 @@ func (c *collectionRpcClient) DeleteCat(ctx context.Context, in *DeleteCatReq, o
 // All implementations must embed UnimplementedCollectionRpcServer
 // for forward compatibility
 type CollectionRpcServer interface {
+	SearchCat(context.Context, *SearchCatReq) (*SearchCatResp, error)
 	ListCat(context.Context, *ListCatReq) (*ListCatResp, error)
 	RetrieveCat(context.Context, *RetrieveCatReq) (*RetrieveCatResp, error)
 	CreateCat(context.Context, *CreateCatReq) (*CreateCatResp, error)
@@ -98,6 +109,9 @@ type CollectionRpcServer interface {
 type UnimplementedCollectionRpcServer struct {
 }
 
+func (UnimplementedCollectionRpcServer) SearchCat(context.Context, *SearchCatReq) (*SearchCatResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchCat not implemented")
+}
 func (UnimplementedCollectionRpcServer) ListCat(context.Context, *ListCatReq) (*ListCatResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCat not implemented")
 }
@@ -124,6 +138,24 @@ type UnsafeCollectionRpcServer interface {
 
 func RegisterCollectionRpcServer(s grpc.ServiceRegistrar, srv CollectionRpcServer) {
 	s.RegisterService(&CollectionRpc_ServiceDesc, srv)
+}
+
+func _CollectionRpc_SearchCat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchCatReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CollectionRpcServer).SearchCat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cat.collection_rpc/SearchCat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CollectionRpcServer).SearchCat(ctx, req.(*SearchCatReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CollectionRpc_ListCat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -223,6 +255,10 @@ var CollectionRpc_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cat.collection_rpc",
 	HandlerType: (*CollectionRpcServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SearchCat",
+			Handler:    _CollectionRpc_SearchCat_Handler,
+		},
 		{
 			MethodName: "ListCat",
 			Handler:    _CollectionRpc_ListCat_Handler,

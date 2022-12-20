@@ -4,8 +4,6 @@ import (
 	"context"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
 	"github.com/xh-polaris/meowchat-collection-rpc/pb"
-	"strconv"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -24,11 +22,7 @@ func NewDeleteCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeleteC
 }
 
 func (l *DeleteCatLogic) DeleteCat(in *pb.DeleteCatReq) (*pb.DeleteCatResp, error) {
-	id, err := strconv.ParseInt(in.CatId, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	err = l.svcCtx.CatModel.DeleteSoftly(l.ctx, id)
+	err := l.svcCtx.CatModel.Delete(l.ctx, in.CatId)
 	if err != nil {
 		return nil, err
 	}

@@ -21,6 +21,17 @@ message Cat {
   repeated string avatars = 14;
 }
 
+message SearchCatReq {
+  int64 count = 1; // 获取的数量
+  int64 skip=2;//跳过前skip个
+  string communityId = 3;
+  string keyword = 4;
+}
+
+message SearchCatResp {
+  repeated Cat cats = 1;
+}
+
 message ListCatReq {
   string communityId = 1;
   int64 count = 2; // 获取的数量
@@ -62,6 +73,7 @@ message DeleteCatResp {
 }
 
 service collection_rpc {
+  rpc SearchCat(SearchCatReq) returns (SearchCatResp);
   rpc ListCat(ListCatReq) returns (ListCatResp);
   rpc RetrieveCat(RetrieveCatReq) returns (RetrieveCatResp);
   rpc CreateCat(CreateCatReq) returns (CreateCatResp);
