@@ -3,9 +3,8 @@ package logic
 import (
 	"context"
 	"github.com/jinzhu/copier"
-	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
-
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
+	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -24,11 +23,10 @@ func NewSearchCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SearchC
 }
 
 func (l *SearchCatLogic) SearchCat(in *pb.SearchCatReq) (*pb.SearchCatResp, error) {
-	data, err := l.svcCtx.CatModel.Search(l.ctx, in.CommunityId, in.Keyword, in.Skip, in.Count)
+	data, total, err := l.svcCtx.CatModel.Search(l.ctx, in.CommunityId, in.Keyword, in.Skip, in.Count)
 	if err != nil {
 		return nil, err
 	}
-	count, err := l.svcCtx.CatModel.SearchNumber(l.ctx, in.CommunityId, in.Keyword)
 	if err != nil {
 		return nil, err
 	}
@@ -43,5 +41,5 @@ func (l *SearchCatLogic) SearchCat(in *pb.SearchCatReq) (*pb.SearchCatResp, erro
 		cat.CreateAt = val.CreateAt.Unix()
 		cats = append(cats, cat)
 	}
-	return &pb.SearchCatResp{Cats: cats, Count: count}, nil
+	return &pb.SearchCatResp{Cats: cats, Total: total}, nil
 }

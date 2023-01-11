@@ -23,25 +23,25 @@ message Cat {
 
 message SearchCatReq {
   int64 count = 1; // 获取的数量
-  int64 skip=2;//跳过前skip个
+  int64 skip = 2;//跳过前skip个
   string communityId = 3;
   string keyword = 4;
 }
 
 message SearchCatResp {
   repeated Cat cats = 1;
-  int64 count = 2;
+  int64 total = 2;
 }
 
 message ListCatReq {
   string communityId = 1;
   int64 count = 2; // 获取的数量
-  int64 skip=3;//跳过前skip个
+  int64 skip = 3;//跳过前skip个
 }
 
 message ListCatResp {
   repeated Cat cats = 1;
-  int64 count=2;
+  int64 total = 2;
 }
 
 message RetrieveCatReq {

@@ -3,9 +3,8 @@ package logic
 import (
 	"context"
 	"github.com/jinzhu/copier"
-	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
-
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
+	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -24,7 +23,7 @@ func NewListCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListCatLo
 }
 
 func (l *ListCatLogic) ListCat(in *pb.ListCatReq) (*pb.ListCatResp, error) {
-	data, countx, err := l.svcCtx.CatModel.FindManyByCommunityId(l.ctx, in.CommunityId, in.Skip, in.Count)
+	data, total, err := l.svcCtx.CatModel.FindManyByCommunityId(l.ctx, in.CommunityId, in.Skip, in.Count)
 	if err != nil {
 		return nil, err
 	}
@@ -39,5 +38,5 @@ func (l *ListCatLogic) ListCat(in *pb.ListCatReq) (*pb.ListCatResp, error) {
 		cat.CreateAt = val.CreateAt.Unix()
 		cats = append(cats, cat)
 	}
-	return &pb.ListCatResp{Cats: cats, Count: countx}, nil
+	return &pb.ListCatResp{Cats: cats, Total: total}, nil
 }

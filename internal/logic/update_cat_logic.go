@@ -5,7 +5,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/xh-polaris/meowchat-collection-rpc/errorx"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/model"
-	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
+	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
