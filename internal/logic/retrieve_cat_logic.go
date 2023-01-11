@@ -6,7 +6,7 @@ import (
 	"github.com/xh-polaris/meowchat-collection-rpc/errorx"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/model"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
-	"github.com/xh-polaris/meowchat-collection-rpc/pb"
+	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

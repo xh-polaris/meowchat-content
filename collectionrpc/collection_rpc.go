@@ -6,7 +6,7 @@ package collectionrpc
 import (
 	"context"
 
-	"github.com/xh-polaris/meowchat-collection-rpc/pb"
+	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"

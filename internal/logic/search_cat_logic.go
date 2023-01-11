@@ -3,10 +3,9 @@ package logic
 import (
 	"context"
 	"github.com/jinzhu/copier"
+	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
 
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
-	"github.com/xh-polaris/meowchat-collection-rpc/pb"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -29,6 +28,10 @@ func (l *SearchCatLogic) SearchCat(in *pb.SearchCatReq) (*pb.SearchCatResp, erro
 	if err != nil {
 		return nil, err
 	}
+	count, err := l.svcCtx.CatModel.SearchNumber(l.ctx, in.CommunityId, in.Keyword)
+	if err != nil {
+		return nil, err
+	}
 	var cats []*pb.Cat
 	for _, val := range data {
 		cat := &pb.Cat{}
@@ -40,5 +43,5 @@ func (l *SearchCatLogic) SearchCat(in *pb.SearchCatReq) (*pb.SearchCatResp, erro
 		cat.CreateAt = val.CreateAt.Unix()
 		cats = append(cats, cat)
 	}
-	return &pb.SearchCatResp{Cats: cats}, nil
+	return &pb.SearchCatResp{Cats: cats, Count: count}, nil
 }

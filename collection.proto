@@ -30,6 +30,7 @@ message SearchCatReq {
 
 message SearchCatResp {
   repeated Cat cats = 1;
+  int64 count = 2;
 }
 
 message ListCatReq {
@@ -40,6 +41,7 @@ message ListCatReq {
 
 message ListCatResp {
   repeated Cat cats = 1;
+  int64 count=2;
 }
 
 message RetrieveCatReq {

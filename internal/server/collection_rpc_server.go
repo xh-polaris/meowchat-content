@@ -8,7 +8,7 @@ import (
 
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/logic"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
-	"github.com/xh-polaris/meowchat-collection-rpc/pb"
+	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
 )
 
 type CollectionRpcServer struct {

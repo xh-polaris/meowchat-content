@@ -5,12 +5,14 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/config"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -30,8 +32,9 @@ type (
 	// and implement the added methods in customCatModel.
 	CatModel interface {
 		catModel
-		FindManyByCommunityId(ctx context.Context, CommunityId string, skip int64, count int64) ([]*Cat, error)
+		FindManyByCommunityId(ctx context.Context, communityId string, skip int64, count int64) ([]*Cat, int64, error)
 		Search(ctx context.Context, communityId, keyword string, skip, count int64) ([]*Cat, error)
+		SearchNumber(ctx context.Context, communityId, keyword string) (int64, error)
 	}
 
 	customCatModel struct {
@@ -60,13 +63,17 @@ func NewCatModel(url, db string, c cache.CacheConf, es config.ElasticsearchConf)
 	}
 }
 
-func (m *customCatModel) FindManyByCommunityId(ctx context.Context, communityId string, skip int64, count int64) ([]*Cat, error) {
+func (m *customCatModel) FindManyByCommunityId(ctx context.Context, communityId string, skip int64, count int64) ([]*Cat, int64, error) {
 	data := make([]*Cat, 0, 20)
 	err := m.conn.Find(ctx, &data, bson.M{"communityId": communityId}, &options.FindOptions{Skip: &skip, Limit: &count})
 	if err != nil {
-		return nil, err
+		return nil, -1, err
 	}
-	return data, nil
+	countx, err := m.conn.CountDocuments(ctx, bson.M{"communityId": communityId})
+	if err != nil {
+		return nil, -1, err
+	}
+	return data, countx, nil
 }
 
 func (m *customCatModel) Search(ctx context.Context, communityId, keyword string, skip, count int64) ([]*Cat, error) {
@@ -156,4 +163,71 @@ func (m *customCatModel) Search(ctx context.Context, communityId, keyword string
 		cats = append(cats, cat)
 	}
 	return cats, nil
+}
+
+func (m *customCatModel) SearchNumber(ctx context.Context, communityId, keyword string) (int64, error) {
+	search := m.es.Count
+	query := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []any{
+					map[string]any{
+						"term": map[string]any{
+							"communityId": communityId,
+						},
+					},
+					map[string]any{
+						"multi_match": map[string]any{
+							"query":  keyword,
+							"fields": []string{"details", "name", "area", "color"},
+						},
+					},
+				},
+				"filter": []any{
+					map[string]any{
+						"term": map[string]any{
+							"isDeleted": false,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		return -1, err
+	}
+	res, err := search(
+		search.WithIndex(CatIndexName),
+		search.WithContext(ctx),
+		search.WithBody(&buf),
+	)
+	if err != nil {
+		return -1, err
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		var e map[string]interface{}
+		if err := json.NewDecoder(res.Body).Decode(&e); err != nil {
+			return -1, err
+		} else {
+			logx.Errorf("[%s] %s: %s",
+				res.Status(),
+				e["error"].(map[string]interface{})["type"],
+				e["error"].(map[string]interface{})["reason"],
+			)
+		}
+	}
+	var r map[string]any
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		return -1, err
+	}
+	counts := fmt.Sprint(r["count"])
+	num, err := strconv.ParseInt(counts, 10, 64)
+	if err != nil {
+		return -1, err
+	}
+	return num, nil
 }

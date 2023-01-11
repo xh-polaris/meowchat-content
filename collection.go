@@ -3,12 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/xh-polaris/meowchat-collection-rpc/types/pb"
 
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/config"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/server"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
-	"github.com/xh-polaris/meowchat-collection-rpc/pb"
-
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
