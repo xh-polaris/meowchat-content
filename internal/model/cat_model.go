@@ -63,7 +63,11 @@ func NewCatModel(url, db string, c cache.CacheConf, es config.ElasticsearchConf)
 
 func (m *customCatModel) FindManyByCommunityId(ctx context.Context, communityId string, skip int64, count int64) ([]*Cat, int64, error) {
 	data := make([]*Cat, 0, 20)
-	err := m.conn.Find(ctx, &data, bson.M{"communityId": communityId}, &options.FindOptions{Skip: &skip, Limit: &count})
+	err := m.conn.Find(ctx, &data, bson.M{"communityId": communityId}, &options.FindOptions{
+		Skip:  &skip,
+		Limit: &count,
+		Sort:  bson.M{"createAt": -1},
+	})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -94,13 +98,11 @@ func (m *customCatModel) Search(ctx context.Context, communityId, keyword string
 						},
 					},
 				},
-				"filter": []any{
-					map[string]any{
-						"term": map[string]any{
-							"isDeleted": false,
-						},
-					},
-				},
+			},
+		},
+		"sort": map[string]any{
+			"createAt": map[string]any{
+				"order": "desc",
 			},
 		},
 	}
