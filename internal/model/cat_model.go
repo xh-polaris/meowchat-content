@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -22,7 +23,6 @@ import (
 )
 
 const CatCollectionName = "cat"
-const CatIndexName = "meowchat_collection.cat-alias"
 
 var _ CatModel = (*customCatModel)(nil)
 
@@ -37,7 +37,8 @@ type (
 
 	customCatModel struct {
 		*defaultCatModel
-		es *elasticsearch.Client
+		es        *elasticsearch.Client
+		indexName string
 	}
 )
 
@@ -58,6 +59,7 @@ func NewCatModel(url, db string, c cache.CacheConf, es config.ElasticsearchConf)
 	return &customCatModel{
 		defaultCatModel: newDefaultCatModel(conn),
 		es:              esClient,
+		indexName:       fmt.Sprintf("%s.%s-alias", db, CatCollectionName),
 	}
 }
 
@@ -115,7 +117,7 @@ func (m *customCatModel) Search(ctx context.Context, communityId, keyword string
 		return nil, 0, err
 	}
 	res, err := search(
-		search.WithIndex(CatIndexName),
+		search.WithIndex(m.indexName),
 		search.WithContext(ctx),
 		search.WithBody(&buf),
 	)
