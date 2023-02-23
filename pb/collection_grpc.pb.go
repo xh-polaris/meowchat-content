@@ -28,6 +28,9 @@ type CollectionRpcClient interface {
 	CreateCat(ctx context.Context, in *CreateCatReq, opts ...grpc.CallOption) (*CreateCatResp, error)
 	UpdateCat(ctx context.Context, in *UpdateCatReq, opts ...grpc.CallOption) (*UpdateCatResp, error)
 	DeleteCat(ctx context.Context, in *DeleteCatReq, opts ...grpc.CallOption) (*DeleteCatResp, error)
+	CreateImage(ctx context.Context, in *CreateImageReq, opts ...grpc.CallOption) (*CreateImageResp, error)
+	DeleteImage(ctx context.Context, in *DeleteImageReq, opts ...grpc.CallOption) (*DeleteImageResp, error)
+	GetImageByCat(ctx context.Context, in *GetImageByCatReq, opts ...grpc.CallOption) (*GetImageByCatResp, error)
 }
 
 type collectionRpcClient struct {
@@ -92,6 +95,33 @@ func (c *collectionRpcClient) DeleteCat(ctx context.Context, in *DeleteCatReq, o
 	return out, nil
 }
 
+func (c *collectionRpcClient) CreateImage(ctx context.Context, in *CreateImageReq, opts ...grpc.CallOption) (*CreateImageResp, error) {
+	out := new(CreateImageResp)
+	err := c.cc.Invoke(ctx, "/cat.collection_rpc/CreateImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *collectionRpcClient) DeleteImage(ctx context.Context, in *DeleteImageReq, opts ...grpc.CallOption) (*DeleteImageResp, error) {
+	out := new(DeleteImageResp)
+	err := c.cc.Invoke(ctx, "/cat.collection_rpc/DeleteImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *collectionRpcClient) GetImageByCat(ctx context.Context, in *GetImageByCatReq, opts ...grpc.CallOption) (*GetImageByCatResp, error) {
+	out := new(GetImageByCatResp)
+	err := c.cc.Invoke(ctx, "/cat.collection_rpc/GetImageByCat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CollectionRpcServer is the server API for CollectionRpc service.
 // All implementations must embed UnimplementedCollectionRpcServer
 // for forward compatibility
@@ -102,6 +132,9 @@ type CollectionRpcServer interface {
 	CreateCat(context.Context, *CreateCatReq) (*CreateCatResp, error)
 	UpdateCat(context.Context, *UpdateCatReq) (*UpdateCatResp, error)
 	DeleteCat(context.Context, *DeleteCatReq) (*DeleteCatResp, error)
+	CreateImage(context.Context, *CreateImageReq) (*CreateImageResp, error)
+	DeleteImage(context.Context, *DeleteImageReq) (*DeleteImageResp, error)
+	GetImageByCat(context.Context, *GetImageByCatReq) (*GetImageByCatResp, error)
 	mustEmbedUnimplementedCollectionRpcServer()
 }
 
@@ -126,6 +159,15 @@ func (UnimplementedCollectionRpcServer) UpdateCat(context.Context, *UpdateCatReq
 }
 func (UnimplementedCollectionRpcServer) DeleteCat(context.Context, *DeleteCatReq) (*DeleteCatResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCat not implemented")
+}
+func (UnimplementedCollectionRpcServer) CreateImage(context.Context, *CreateImageReq) (*CreateImageResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateImage not implemented")
+}
+func (UnimplementedCollectionRpcServer) DeleteImage(context.Context, *DeleteImageReq) (*DeleteImageResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteImage not implemented")
+}
+func (UnimplementedCollectionRpcServer) GetImageByCat(context.Context, *GetImageByCatReq) (*GetImageByCatResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetImageByCat not implemented")
 }
 func (UnimplementedCollectionRpcServer) mustEmbedUnimplementedCollectionRpcServer() {}
 
@@ -248,6 +290,60 @@ func _CollectionRpc_DeleteCat_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CollectionRpc_CreateImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateImageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CollectionRpcServer).CreateImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cat.collection_rpc/CreateImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CollectionRpcServer).CreateImage(ctx, req.(*CreateImageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CollectionRpc_DeleteImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteImageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CollectionRpcServer).DeleteImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cat.collection_rpc/DeleteImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CollectionRpcServer).DeleteImage(ctx, req.(*DeleteImageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CollectionRpc_GetImageByCat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetImageByCatReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CollectionRpcServer).GetImageByCat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cat.collection_rpc/GetImageByCat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CollectionRpcServer).GetImageByCat(ctx, req.(*GetImageByCatReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CollectionRpc_ServiceDesc is the grpc.ServiceDesc for CollectionRpc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -278,6 +374,18 @@ var CollectionRpc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCat",
 			Handler:    _CollectionRpc_DeleteCat_Handler,
+		},
+		{
+			MethodName: "CreateImage",
+			Handler:    _CollectionRpc_CreateImage_Handler,
+		},
+		{
+			MethodName: "DeleteImage",
+			Handler:    _CollectionRpc_DeleteImage_Handler,
+		},
+		{
+			MethodName: "GetImageByCat",
+			Handler:    _CollectionRpc_GetImageByCat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -74,6 +74,33 @@ message DeleteCatReq {
 message DeleteCatResp {
 }
 
+message CreateImageReq {
+  string catId = 1;
+  string imageUrl = 2;
+}
+
+message CreateImageResp {
+  string imageId = 1;
+}
+
+message DeleteImageReq {
+  string imageId = 1;
+}
+
+message DeleteImageResp {
+}
+
+message GetImageByCatReq {
+  string catId = 1;
+  string prevId = 2;
+  int64 limit = 3;
+}
+
+message GetImageByCatResp {
+  repeated string imageUrl = 1;
+  string lastId = 2;
+}
+
 service collection_rpc {
   rpc SearchCat(SearchCatReq) returns (SearchCatResp);
   rpc ListCat(ListCatReq) returns (ListCatResp);
@@ -81,4 +108,7 @@ service collection_rpc {
   rpc CreateCat(CreateCatReq) returns (CreateCatResp);
   rpc UpdateCat(UpdateCatReq) returns (UpdateCatResp);
   rpc DeleteCat(DeleteCatReq) returns (DeleteCatResp);
+  rpc CreateImage(CreateImageReq) returns (CreateImageResp);
+  rpc DeleteImage(DeleteImageReq) returns (DeleteImageResp);
+  rpc GetImageByCat(GetImageByCatReq) returns (GetImageByCatResp);
 }

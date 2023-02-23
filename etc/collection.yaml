@@ -5,10 +5,10 @@ Log:
   Encoding: plain
   Level: debug
 Mongo:
-  URL: mongodb://root:password@lh2.xhpolaris.com:30002/?directConnection=true
+  URL: mongodb://localhost:27017
   DB: meowchat_collection
 Cache:
-  - Host: $CACHE_HOST
+  - Host: localhost:3306
 Elasticsearch:
   Addresses:
     - https://127.0.0.1:9200
