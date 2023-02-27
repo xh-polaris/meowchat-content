@@ -74,13 +74,17 @@ message DeleteCatReq {
 message DeleteCatResp {
 }
 
-message CreateImageReq {
+message Image {
   string catId = 1;
-  string imageUrl = 2;
+  string url = 2;
+}
+
+message CreateImageReq {
+  repeated Image image = 1;
 }
 
 message CreateImageResp {
-  string imageId = 1;
+  repeated string imageId = 1;
 }
 
 message DeleteImageReq {
@@ -92,7 +96,7 @@ message DeleteImageResp {
 
 message GetImageByCatReq {
   string catId = 1;
-  string prevId = 2;
+  optional string prevId = 2;
   int64 limit = 3;
 }
 

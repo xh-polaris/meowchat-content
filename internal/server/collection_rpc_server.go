@@ -5,15 +5,15 @@ package server
 
 import (
 	"context"
-	pb2 "github.com/xh-polaris/meowchat-collection-rpc/pb"
 
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/logic"
 	"github.com/xh-polaris/meowchat-collection-rpc/internal/svc"
+	"github.com/xh-polaris/meowchat-collection-rpc/pb"
 )
 
 type CollectionRpcServer struct {
 	svcCtx *svc.ServiceContext
-	pb2.UnimplementedCollectionRpcServer
+	pb.UnimplementedCollectionRpcServer
 }
 
 func NewCollectionRpcServer(svcCtx *svc.ServiceContext) *CollectionRpcServer {
@@ -22,47 +22,47 @@ func NewCollectionRpcServer(svcCtx *svc.ServiceContext) *CollectionRpcServer {
 	}
 }
 
-func (s *CollectionRpcServer) SearchCat(ctx context.Context, in *pb2.SearchCatReq) (*pb2.SearchCatResp, error) {
+func (s *CollectionRpcServer) SearchCat(ctx context.Context, in *pb.SearchCatReq) (*pb.SearchCatResp, error) {
 	l := logic.NewSearchCatLogic(ctx, s.svcCtx)
 	return l.SearchCat(in)
 }
 
-func (s *CollectionRpcServer) ListCat(ctx context.Context, in *pb2.ListCatReq) (*pb2.ListCatResp, error) {
+func (s *CollectionRpcServer) ListCat(ctx context.Context, in *pb.ListCatReq) (*pb.ListCatResp, error) {
 	l := logic.NewListCatLogic(ctx, s.svcCtx)
 	return l.ListCat(in)
 }
 
-func (s *CollectionRpcServer) RetrieveCat(ctx context.Context, in *pb2.RetrieveCatReq) (*pb2.RetrieveCatResp, error) {
+func (s *CollectionRpcServer) RetrieveCat(ctx context.Context, in *pb.RetrieveCatReq) (*pb.RetrieveCatResp, error) {
 	l := logic.NewRetrieveCatLogic(ctx, s.svcCtx)
 	return l.RetrieveCat(in)
 }
 
-func (s *CollectionRpcServer) CreateCat(ctx context.Context, in *pb2.CreateCatReq) (*pb2.CreateCatResp, error) {
+func (s *CollectionRpcServer) CreateCat(ctx context.Context, in *pb.CreateCatReq) (*pb.CreateCatResp, error) {
 	l := logic.NewCreateCatLogic(ctx, s.svcCtx)
 	return l.CreateCat(in)
 }
 
-func (s *CollectionRpcServer) UpdateCat(ctx context.Context, in *pb2.UpdateCatReq) (*pb2.UpdateCatResp, error) {
+func (s *CollectionRpcServer) UpdateCat(ctx context.Context, in *pb.UpdateCatReq) (*pb.UpdateCatResp, error) {
 	l := logic.NewUpdateCatLogic(ctx, s.svcCtx)
 	return l.UpdateCat(in)
 }
 
-func (s *CollectionRpcServer) DeleteCat(ctx context.Context, in *pb2.DeleteCatReq) (*pb2.DeleteCatResp, error) {
+func (s *CollectionRpcServer) DeleteCat(ctx context.Context, in *pb.DeleteCatReq) (*pb.DeleteCatResp, error) {
 	l := logic.NewDeleteCatLogic(ctx, s.svcCtx)
 	return l.DeleteCat(in)
 }
 
-func (s *CollectionRpcServer) CreateImage(ctx context.Context, in *pb2.CreateImageReq) (*pb2.CreateImageResp, error) {
+func (s *CollectionRpcServer) CreateImage(ctx context.Context, in *pb.CreateImageReq) (*pb.CreateImageResp, error) {
 	l := logic.NewCreateImageLogic(ctx, s.svcCtx)
 	return l.CreateImage(in)
 }
 
-func (s *CollectionRpcServer) DeleteImage(ctx context.Context, in *pb2.DeleteImageReq) (*pb2.DeleteImageResp, error) {
+func (s *CollectionRpcServer) DeleteImage(ctx context.Context, in *pb.DeleteImageReq) (*pb.DeleteImageResp, error) {
 	l := logic.NewDeleteImageLogic(ctx, s.svcCtx)
 	return l.DeleteImage(in)
 }
 
-func (s *CollectionRpcServer) GetImageByCat(ctx context.Context, in *pb2.GetImageByCatReq) (*pb2.GetImageByCatResp, error) {
+func (s *CollectionRpcServer) GetImageByCat(ctx context.Context, in *pb.GetImageByCatReq) (*pb.GetImageByCatResp, error) {
 	l := logic.NewGetImageByCatLogic(ctx, s.svcCtx)
 	return l.GetImageByCat(in)
 }

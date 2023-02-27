@@ -23,13 +23,20 @@ func NewCreateImageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Creat
 }
 
 func (l *CreateImageLogic) CreateImage(in *pb.CreateImageReq) (*pb.CreateImageResp, error) {
-	data := model.Image{
-		CatId:    in.CatId,
-		ImageUrl: in.ImageUrl,
+	data := make([]*model.Image, len(in.Image))
+	for i := 0; i < len(data); i++ {
+		data[i] = &model.Image{
+			CatId:    in.Image[i].CatId,
+			ImageUrl: in.Image[i].Url,
+		}
 	}
-	err := l.svcCtx.ImageModel.Insert(l.ctx, &data)
+	err := l.svcCtx.ImageModel.InsertMany(l.ctx, data)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CreateImageResp{ImageId: data.ID.Hex()}, nil
+	id := make([]string, len(data))
+	for i := 0; i < len(data); i++ {
+		id[i] = data[i].ID.Hex()
+	}
+	return &pb.CreateImageResp{ImageId: id}, nil
 }

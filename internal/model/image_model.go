@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/mon"
@@ -21,12 +22,29 @@ type (
 	ImageModel interface {
 		imageModel
 		ListImageByCat(ctx context.Context, catId string, lastId primitive.ObjectID, limit int64) ([]*Image, error)
+		InsertMany(ctx context.Context, image []*Image) error
 	}
 
 	customImageModel struct {
 		*defaultImageModel
 	}
 )
+
+func (c customImageModel) InsertMany(ctx context.Context, image []*Image) error {
+	for i := 0; i < len(image); i++ {
+		if image[i].ID.IsZero() {
+			image[i].ID = primitive.NewObjectID()
+			image[i].CreateAt = time.Now()
+			image[i].UpdateAt = time.Now()
+		}
+	}
+	data := make([]interface{}, len(image))
+	for i := 0; i < len(image); i++ {
+		data[i] = image[i]
+	}
+	_, err := c.conn.InsertMany(ctx, data)
+	return err
+}
 
 func (c customImageModel) ListImageByCat(ctx context.Context, catId string, lastId primitive.ObjectID, limit int64) ([]*Image, error) {
 

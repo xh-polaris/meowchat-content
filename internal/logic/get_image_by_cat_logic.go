@@ -29,11 +29,11 @@ func NewGetImageByCatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Get
 func (l *GetImageByCatLogic) GetImageByCat(in *pb.GetImageByCatReq) (*pb.GetImageByCatResp, error) {
 
 	var lastId primitive.ObjectID
-	if in.PrevId == "" {
+	if in.PrevId == nil {
 		lastId = primitive.NewObjectIDFromTimestamp(time.Unix(math.MaxInt32, 0))
 	} else {
 		var err error
-		lastId, err = primitive.ObjectIDFromHex(in.PrevId)
+		lastId, err = primitive.ObjectIDFromHex(*in.PrevId)
 		if err != nil {
 			return nil, errorx.ErrInvalidId
 		}

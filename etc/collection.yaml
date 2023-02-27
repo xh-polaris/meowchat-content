@@ -8,7 +8,7 @@ Mongo:
   URL: mongodb://localhost:27017
   DB: meowchat_collection
 Cache:
-  - Host: localhost:3306
+  - Host: localhost:6379
 Elasticsearch:
   Addresses:
     - https://127.0.0.1:9200
