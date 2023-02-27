@@ -74,17 +74,17 @@ message DeleteCatReq {
 message DeleteCatResp {
 }
 
-message Image {
+message CreateImageElement {
   string catId = 1;
   string url = 2;
 }
 
 message CreateImageReq {
-  repeated Image image = 1;
+  repeated CreateImageElement images = 1;
 }
 
 message CreateImageResp {
-  repeated string imageId = 1;
+  repeated string imageIds = 1;
 }
 
 message DeleteImageReq {
@@ -94,15 +94,22 @@ message DeleteImageReq {
 message DeleteImageResp {
 }
 
-message GetImageByCatReq {
+message ListImageReq {
   string catId = 1;
   optional string prevId = 2;
   int64 limit = 3;
+  int64 offset = 4;
+  bool backward = 5;
 }
 
-message GetImageByCatResp {
-  repeated string imageUrl = 1;
-  string lastId = 2;
+message Image {
+  string id = 1;
+  string url = 2;
+  string catId = 3;
+}
+
+message ListImageResp {
+  repeated Image images = 1;
 }
 
 service collection_rpc {
@@ -114,5 +121,5 @@ service collection_rpc {
   rpc DeleteCat(DeleteCatReq) returns (DeleteCatResp);
   rpc CreateImage(CreateImageReq) returns (CreateImageResp);
   rpc DeleteImage(DeleteImageReq) returns (DeleteImageResp);
-  rpc GetImageByCat(GetImageByCatReq) returns (GetImageByCatResp);
+  rpc ListImage(ListImageReq) returns (ListImageResp);
 }

@@ -2,10 +2,10 @@ package model
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/cache"
-	"github.com/zeromicro/go-zero/core/stores/mon"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,7 +21,7 @@ type (
 	// and implement the added methods in customImageModel.
 	ImageModel interface {
 		imageModel
-		ListImageByCat(ctx context.Context, catId string, lastId primitive.ObjectID, limit int64) ([]*Image, error)
+		ListImage(ctx context.Context, catId string, lastId *string, limit, offset int64, backward bool) ([]*Image, error)
 		InsertMany(ctx context.Context, image []*Image) error
 	}
 
@@ -46,23 +46,47 @@ func (c customImageModel) InsertMany(ctx context.Context, image []*Image) error 
 	return err
 }
 
-func (c customImageModel) ListImageByCat(ctx context.Context, catId string, lastId primitive.ObjectID, limit int64) ([]*Image, error) {
-
+func (c customImageModel) ListImage(ctx context.Context, catId string, lastId *string, limit, offset int64, backward bool) ([]*Image, error) {
 	var data []*Image
+	var oid primitive.ObjectID
+	var err error
 
+	// 构造lastId
+	if lastId == nil {
+		if backward {
+			oid = primitive.NewObjectIDFromTimestamp(time.Unix(math.MinInt32, 0))
+		} else {
+			oid = primitive.NewObjectIDFromTimestamp(time.Unix(math.MaxInt32, 0))
+		}
+	} else {
+		oid, err = primitive.ObjectIDFromHex(*lastId)
+		if err != nil {
+			return nil, ErrInvalidObjectId
+		}
+	}
+
+	// 构造请求，新的数据在前面，数值越大越新
 	opts := options.FindOptions{
 		Limit: &limit,
-		Sort:  bson.D{bson.E{Key: "_id", Value: -1}},
+		Skip:  &offset,
+		Sort:  bson.M{"_id": -1},
 	}
-	filter := bson.M{"catId": catId, "_id": bson.M{"$lt": lastId}}
-	err := c.conn.Find(ctx, &data, filter, &opts)
-	switch err {
-	case nil:
-		return data, nil
-	case mon.ErrNotFound:
-		return nil, ErrNotFound
-	default:
+	filter := bson.M{"catId": catId}
+	if backward {
+		filter["_id"] = bson.M{"$gt": oid}
+	} else {
+		filter["_id"] = bson.M{"$lt": oid}
+	}
+
+	err = c.conn.Find(ctx, &data, filter, &opts)
+	if err != nil {
 		return nil, err
+	} else if len(data) <= 0 {
+		return data, nil
+	} else if backward {
+		return data, nil
+	} else {
+		return data, nil
 	}
 }
 

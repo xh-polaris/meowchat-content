@@ -30,7 +30,7 @@ type CollectionRpcClient interface {
 	DeleteCat(ctx context.Context, in *DeleteCatReq, opts ...grpc.CallOption) (*DeleteCatResp, error)
 	CreateImage(ctx context.Context, in *CreateImageReq, opts ...grpc.CallOption) (*CreateImageResp, error)
 	DeleteImage(ctx context.Context, in *DeleteImageReq, opts ...grpc.CallOption) (*DeleteImageResp, error)
-	GetImageByCat(ctx context.Context, in *GetImageByCatReq, opts ...grpc.CallOption) (*GetImageByCatResp, error)
+	ListImage(ctx context.Context, in *ListImageReq, opts ...grpc.CallOption) (*ListImageResp, error)
 }
 
 type collectionRpcClient struct {
@@ -113,9 +113,9 @@ func (c *collectionRpcClient) DeleteImage(ctx context.Context, in *DeleteImageRe
 	return out, nil
 }
 
-func (c *collectionRpcClient) GetImageByCat(ctx context.Context, in *GetImageByCatReq, opts ...grpc.CallOption) (*GetImageByCatResp, error) {
-	out := new(GetImageByCatResp)
-	err := c.cc.Invoke(ctx, "/cat.collection_rpc/GetImageByCat", in, out, opts...)
+func (c *collectionRpcClient) ListImage(ctx context.Context, in *ListImageReq, opts ...grpc.CallOption) (*ListImageResp, error) {
+	out := new(ListImageResp)
+	err := c.cc.Invoke(ctx, "/cat.collection_rpc/ListImage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ type CollectionRpcServer interface {
 	DeleteCat(context.Context, *DeleteCatReq) (*DeleteCatResp, error)
 	CreateImage(context.Context, *CreateImageReq) (*CreateImageResp, error)
 	DeleteImage(context.Context, *DeleteImageReq) (*DeleteImageResp, error)
-	GetImageByCat(context.Context, *GetImageByCatReq) (*GetImageByCatResp, error)
+	ListImage(context.Context, *ListImageReq) (*ListImageResp, error)
 	mustEmbedUnimplementedCollectionRpcServer()
 }
 
@@ -166,8 +166,8 @@ func (UnimplementedCollectionRpcServer) CreateImage(context.Context, *CreateImag
 func (UnimplementedCollectionRpcServer) DeleteImage(context.Context, *DeleteImageReq) (*DeleteImageResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteImage not implemented")
 }
-func (UnimplementedCollectionRpcServer) GetImageByCat(context.Context, *GetImageByCatReq) (*GetImageByCatResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetImageByCat not implemented")
+func (UnimplementedCollectionRpcServer) ListImage(context.Context, *ListImageReq) (*ListImageResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListImage not implemented")
 }
 func (UnimplementedCollectionRpcServer) mustEmbedUnimplementedCollectionRpcServer() {}
 
@@ -326,20 +326,20 @@ func _CollectionRpc_DeleteImage_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CollectionRpc_GetImageByCat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetImageByCatReq)
+func _CollectionRpc_ListImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListImageReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CollectionRpcServer).GetImageByCat(ctx, in)
+		return srv.(CollectionRpcServer).ListImage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cat.collection_rpc/GetImageByCat",
+		FullMethod: "/cat.collection_rpc/ListImage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CollectionRpcServer).GetImageByCat(ctx, req.(*GetImageByCatReq))
+		return srv.(CollectionRpcServer).ListImage(ctx, req.(*ListImageReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -384,8 +384,8 @@ var CollectionRpc_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CollectionRpc_DeleteImage_Handler,
 		},
 		{
-			MethodName: "GetImageByCat",
-			Handler:    _CollectionRpc_GetImageByCat_Handler,
+			MethodName: "ListImage",
+			Handler:    _CollectionRpc_ListImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
