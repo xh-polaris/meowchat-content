@@ -68,7 +68,7 @@ func (m *customCatModel) FindManyByCommunityId(ctx context.Context, communityId 
 	err := m.conn.Find(ctx, &data, bson.M{"communityId": communityId}, &options.FindOptions{
 		Skip:  &skip,
 		Limit: &count,
-		Sort:  bson.M{"createAt": -1},
+		Sort:  bson.M{"_id": -1},
 	})
 	if err != nil {
 		return nil, 0, err
@@ -96,7 +96,7 @@ func (m *customCatModel) Search(ctx context.Context, communityId, keyword string
 					map[string]any{
 						"multi_match": map[string]any{
 							"query":  keyword,
-							"fields": []string{"details", "name", "area", "color"},
+							"fields": []string{"details", "name^5", "area", "color"},
 						},
 					},
 				},
@@ -106,7 +106,7 @@ func (m *customCatModel) Search(ctx context.Context, communityId, keyword string
 			"_score": map[string]any{
 				"order": "desc",
 			},
-			"createAt": map[string]any{
+			"_id": map[string]any{
 				"order": "desc",
 			},
 		},
