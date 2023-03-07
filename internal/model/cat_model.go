@@ -106,7 +106,7 @@ func (m *customCatModel) Search(ctx context.Context, communityId, keyword string
 			"_score": map[string]any{
 				"order": "desc",
 			},
-			"_id": map[string]any{
+			"createAt": map[string]any{
 				"order": "desc",
 			},
 		},
