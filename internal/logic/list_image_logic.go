@@ -43,5 +43,9 @@ func (l *ListImageLogic) ListImage(in *pb.ListImageReq) (*pb.ListImageResp, erro
 		}
 	}
 
-	return &pb.ListImageResp{Images: imageList}, nil
+	total, err := l.svcCtx.ImageModel.CountImage(l.ctx, in.CatId)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.ListImageResp{Images: imageList, Total: total}, nil
 }

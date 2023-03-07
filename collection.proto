@@ -110,6 +110,7 @@ message Image {
 
 message ListImageResp {
   repeated Image images = 1;
+  int64 total = 2;
 }
 
 service collection_rpc {

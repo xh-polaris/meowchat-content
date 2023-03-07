@@ -23,6 +23,7 @@ type (
 		imageModel
 		ListImage(ctx context.Context, catId string, lastId *string, limit, offset int64, backward bool) ([]*Image, error)
 		InsertMany(ctx context.Context, image []*Image) error
+		CountImage(ctx context.Context, catId string) (int64, error)
 	}
 
 	customImageModel struct {
@@ -30,7 +31,7 @@ type (
 	}
 )
 
-func (c customImageModel) InsertMany(ctx context.Context, image []*Image) error {
+func (c *customImageModel) InsertMany(ctx context.Context, image []*Image) error {
 	for i := 0; i < len(image); i++ {
 		if image[i].ID.IsZero() {
 			image[i].ID = primitive.NewObjectID()
@@ -46,7 +47,7 @@ func (c customImageModel) InsertMany(ctx context.Context, image []*Image) error 
 	return err
 }
 
-func (c customImageModel) ListImage(ctx context.Context, catId string, lastId *string, limit, offset int64, backward bool) ([]*Image, error) {
+func (c *customImageModel) ListImage(ctx context.Context, catId string, lastId *string, limit, offset int64, backward bool) ([]*Image, error) {
 	var data []*Image
 	var oid primitive.ObjectID
 	var err error
@@ -88,6 +89,14 @@ func (c customImageModel) ListImage(ctx context.Context, catId string, lastId *s
 	} else {
 		return data, nil
 	}
+}
+
+func (c *customImageModel) CountImage(ctx context.Context, catId string) (int64, error) {
+	total, err := c.conn.CountDocuments(ctx, bson.M{"catId": catId})
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
 }
 
 // NewImageModel returns a model for the mongo.
