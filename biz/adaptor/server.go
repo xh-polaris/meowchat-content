@@ -4,11 +4,13 @@ import (
 	"context"
 
 	"github.com/xh-polaris/meowchat-collection/biz/application/service"
+	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/config"
 
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/collection"
 )
 
 type CollectionServerImpl struct {
+	*config.Config
 	CatService   service.CatService
 	ImageService service.ImageService
 }

@@ -29,6 +29,7 @@ func NewCollectionServerImpl() (*adaptor.CollectionServerImpl, error) {
 		ImageModel: imageModel,
 	}
 	collectionServerImpl := &adaptor.CollectionServerImpl{
+		Config:       configConfig,
 		CatService:   catServiceImpl,
 		ImageService: imageServiceImpl,
 	}

@@ -15,7 +15,8 @@ type ElasticsearchConf struct {
 
 type Config struct {
 	service.ServiceConf
-	Mongo struct {
+	ListenOn string
+	Mongo    struct {
 		URL string
 		DB  string
 	}
