@@ -18,7 +18,7 @@ env:
   REGISTRY: docker.io
   USERNAME: xhpolaris
   # github.repository as <account>/<repo>
-  IMAGE_NAME: xhpolaris/meowchat-collection
+  IMAGE_NAME: xhpolaris/meowchat-content
 
 jobs:
   build:

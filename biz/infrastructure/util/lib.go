@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/cloudwego/hertz/pkg/common/json"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/util/log"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/log"
 )
 
 func JSONF(v any) string {

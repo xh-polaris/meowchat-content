@@ -3,32 +3,31 @@ package service
 import (
 	"context"
 
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/data/db"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/mapper"
+	imagemapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 
 	"github.com/google/wire"
-	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/collection"
+	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 )
 
-type ImageService interface {
-	CreateImage(ctx context.Context, req *collection.CreateImageReq) (*collection.CreateImageResp, error)
-	DeleteImage(ctx context.Context, req *collection.DeleteImageReq) (*collection.DeleteImageResp, error)
-	ListImage(ctx context.Context, req *collection.ListImageReq) (*collection.ListImageResp, error)
+type IImageService interface {
+	CreateImage(ctx context.Context, req *content.CreateImageReq) (*content.CreateImageResp, error)
+	DeleteImage(ctx context.Context, req *content.DeleteImageReq) (*content.DeleteImageResp, error)
+	ListImage(ctx context.Context, req *content.ListImageReq) (*content.ListImageResp, error)
 }
 
-type ImageServiceImpl struct {
-	ImageModel mapper.ImageModel
+type ImageService struct {
+	ImageModel imagemapper.IMongoMapper
 }
 
 var ImageSet = wire.NewSet(
-	wire.Struct(new(ImageServiceImpl), "*"),
-	wire.Bind(new(ImageService), new(*ImageServiceImpl)),
+	wire.Struct(new(ImageService), "*"),
+	wire.Bind(new(IImageService), new(*ImageService)),
 )
 
-func (s *ImageServiceImpl) CreateImage(ctx context.Context, req *collection.CreateImageReq) (*collection.CreateImageResp, error) {
-	data := make([]*db.Image, len(req.Images))
+func (s *ImageService) CreateImage(ctx context.Context, req *content.CreateImageReq) (*content.CreateImageResp, error) {
+	data := make([]*imagemapper.Image, len(req.Images))
 	for i := 0; i < len(data); i++ {
-		data[i] = &db.Image{
+		data[i] = &imagemapper.Image{
 			CatId:    req.Images[i].CatId,
 			ImageUrl: req.Images[i].Url,
 		}
@@ -41,19 +40,19 @@ func (s *ImageServiceImpl) CreateImage(ctx context.Context, req *collection.Crea
 	for i := 0; i < len(data); i++ {
 		id[i] = data[i].ID.Hex()
 	}
-	return &collection.CreateImageResp{ImageIds: id}, nil
+	return &content.CreateImageResp{ImageIds: id}, nil
 }
 
-func (s *ImageServiceImpl) DeleteImage(ctx context.Context, req *collection.DeleteImageReq) (*collection.DeleteImageResp, error) {
+func (s *ImageService) DeleteImage(ctx context.Context, req *content.DeleteImageReq) (*content.DeleteImageResp, error) {
 	err := s.ImageModel.Delete(ctx, req.ImageId)
 	if err != nil {
 		return nil, err
 	}
 
-	return &collection.DeleteImageResp{}, nil
+	return &content.DeleteImageResp{}, nil
 }
 
-func (s *ImageServiceImpl) ListImage(ctx context.Context, req *collection.ListImageReq) (*collection.ListImageResp, error) {
+func (s *ImageService) ListImage(ctx context.Context, req *content.ListImageReq) (*content.ListImageResp, error) {
 	res, err := s.ImageModel.ListImage(ctx, req.CatId, req.PrevId, req.Limit, req.Offset, req.Backward)
 	if err != nil {
 		return nil, err
@@ -66,9 +65,9 @@ func (s *ImageServiceImpl) ListImage(ctx context.Context, req *collection.ListIm
 		}
 	}
 
-	imageList := make([]*collection.Image, len(res))
+	imageList := make([]*content.Image, len(res))
 	for i, image := range res {
-		imageList[i] = &collection.Image{
+		imageList[i] = &content.Image{
 			Id:    image.ID.Hex(),
 			Url:   image.ImageUrl,
 			CatId: image.CatId,
@@ -79,5 +78,5 @@ func (s *ImageServiceImpl) ListImage(ctx context.Context, req *collection.ListIm
 	if err != nil {
 		return nil, err
 	}
-	return &collection.ListImageResp{Images: imageList, Total: total}, nil
+	return &content.ListImageResp{Images: imageList, Total: total}, nil
 }

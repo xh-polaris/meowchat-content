@@ -7,31 +7,50 @@
 package provider
 
 import (
-	"github.com/xh-polaris/meowchat-collection/biz/adaptor"
-	"github.com/xh-polaris/meowchat-collection/biz/application/service"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/config"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/mapper"
+	"github.com/xh-polaris/meowchat-content/biz/adaptor"
+	"github.com/xh-polaris/meowchat-content/biz/application/service"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
 )
 
 // Injectors from wire.go:
 
-func NewCollectionServerImpl() (*adaptor.CollectionServerImpl, error) {
+func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, err
 	}
-	catModel := mapper.NewCatModel(configConfig)
-	catServiceImpl := &service.CatServiceImpl{
-		CatModel: catModel,
+	iMongoMapper := cat.NewMongoMapper(configConfig)
+	iEsMapper := cat.NewEsMapper(configConfig)
+	catService := &service.CatService{
+		CatMongoMapper: iMongoMapper,
+		CatEsMapper:    iEsMapper,
 	}
-	imageModel := mapper.NewImageModel(configConfig)
-	imageServiceImpl := &service.ImageServiceImpl{
-		ImageModel: imageModel,
+	imageIMongoMapper := image.NewMongoMapper(configConfig)
+	imageService := &service.ImageService{
+		ImageModel: imageIMongoMapper,
 	}
-	collectionServerImpl := &adaptor.CollectionServerImpl{
-		Config:       configConfig,
-		CatService:   catServiceImpl,
-		ImageService: imageServiceImpl,
+	momentIMongoMapper := moment.NewMongoMapper(configConfig)
+	momentIEsMapper := moment.NewEsMapper(configConfig)
+	momentService := &service.MomentService{
+		MomentMongoMapper: momentIMongoMapper,
+		MomentEsMapper:    momentIEsMapper,
 	}
-	return collectionServerImpl, nil
+	postIMongoMapper := post.NewMongoMapper(configConfig)
+	postIEsMapper := post.NewEsMapper(configConfig)
+	postService := &service.PostService{
+		PostMongoMapper: postIMongoMapper,
+		PostEsMapper:    postIEsMapper,
+	}
+	contentServerImpl := &adaptor.ContentServerImpl{
+		Config:        configConfig,
+		CatService:    catService,
+		ImageService:  imageService,
+		MomentService: momentService,
+		PostService:   postService,
+	}
+	return contentServerImpl, nil
 }

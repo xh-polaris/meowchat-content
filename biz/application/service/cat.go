@@ -3,45 +3,45 @@ package service
 import (
 	"context"
 
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/consts"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/data/db"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/mapper"
-	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/collection"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
+	catmapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
 
 	"github.com/google/wire"
 	"github.com/jinzhu/copier"
+	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type CatService interface {
-	SearchCat(ctx context.Context, req *collection.SearchCatReq) (res *collection.SearchCatResp, err error)
-	ListCat(ctx context.Context, req *collection.ListCatReq) (res *collection.ListCatResp, err error)
-	RetrieveCat(ctx context.Context, req *collection.RetrieveCatReq) (res *collection.RetrieveCatResp, err error)
-	CreateCat(ctx context.Context, req *collection.CreateCatReq) (res *collection.CreateCatResp, err error)
-	UpdateCat(ctx context.Context, req *collection.UpdateCatReq) (res *collection.UpdateCatResp, err error)
-	DeleteCat(ctx context.Context, req *collection.DeleteCatReq) (res *collection.DeleteCatResp, err error)
+type ICatService interface {
+	SearchCat(ctx context.Context, req *content.SearchCatReq) (res *content.SearchCatResp, err error)
+	ListCat(ctx context.Context, req *content.ListCatReq) (res *content.ListCatResp, err error)
+	RetrieveCat(ctx context.Context, req *content.RetrieveCatReq) (res *content.RetrieveCatResp, err error)
+	CreateCat(ctx context.Context, req *content.CreateCatReq) (res *content.CreateCatResp, err error)
+	UpdateCat(ctx context.Context, req *content.UpdateCatReq) (res *content.UpdateCatResp, err error)
+	DeleteCat(ctx context.Context, req *content.DeleteCatReq) (res *content.DeleteCatResp, err error)
 }
 
-type CatServiceImpl struct {
-	CatModel mapper.CatModel
+type CatService struct {
+	CatMongoMapper catmapper.IMongoMapper
+	CatEsMapper    catmapper.IEsMapper
 }
 
 var CatSet = wire.NewSet(
-	wire.Struct(new(CatServiceImpl), "*"),
-	wire.Bind(new(CatService), new(*CatServiceImpl)),
+	wire.Struct(new(CatService), "*"),
+	wire.Bind(new(ICatService), new(*CatService)),
 )
 
-func (s *CatServiceImpl) SearchCat(ctx context.Context, req *collection.SearchCatReq) (res *collection.SearchCatResp, err error) {
-	data, total, err := s.CatModel.Search(ctx, req.CommunityId, req.Keyword, req.Skip, req.Count)
+func (s *CatService) SearchCat(ctx context.Context, req *content.SearchCatReq) (res *content.SearchCatResp, err error) {
+	data, total, err := s.CatEsMapper.Search(ctx, req.CommunityId, req.Keyword, int(req.Skip), int(req.Count))
 	if err != nil {
 		return nil, err
 	}
 	if err != nil {
 		return nil, err
 	}
-	var cats []*collection.Cat
+	var cats []*content.Cat
 	for _, val := range data {
-		cat := &collection.Cat{}
+		cat := &content.Cat{}
 		err = copier.Copy(cat, val)
 		if err != nil {
 			return nil, err
@@ -50,17 +50,17 @@ func (s *CatServiceImpl) SearchCat(ctx context.Context, req *collection.SearchCa
 		cat.CreateAt = val.CreateAt.Unix()
 		cats = append(cats, cat)
 	}
-	return &collection.SearchCatResp{Cats: cats, Total: total}, nil
+	return &content.SearchCatResp{Cats: cats, Total: total}, nil
 }
 
-func (s *CatServiceImpl) ListCat(ctx context.Context, req *collection.ListCatReq) (res *collection.ListCatResp, err error) {
-	data, total, err := s.CatModel.FindManyByCommunityId(ctx, req.CommunityId, req.Skip, req.Count)
+func (s *CatService) ListCat(ctx context.Context, req *content.ListCatReq) (res *content.ListCatResp, err error) {
+	data, total, err := s.CatMongoMapper.FindManyByCommunityId(ctx, req.CommunityId, req.Skip, req.Count)
 	if err != nil {
 		return nil, err
 	}
-	var cats []*collection.Cat
+	var cats []*content.Cat
 	for _, val := range data {
-		cat := &collection.Cat{}
+		cat := &content.Cat{}
 		err = copier.Copy(cat, val)
 		if err != nil {
 			return nil, err
@@ -69,43 +69,43 @@ func (s *CatServiceImpl) ListCat(ctx context.Context, req *collection.ListCatReq
 		cat.CreateAt = val.CreateAt.Unix()
 		cats = append(cats, cat)
 	}
-	return &collection.ListCatResp{Cats: cats, Total: total}, nil
+	return &content.ListCatResp{Cats: cats, Total: total}, nil
 }
 
-func (s *CatServiceImpl) RetrieveCat(ctx context.Context, req *collection.RetrieveCatReq) (res *collection.RetrieveCatResp, err error) {
-	data, err := s.CatModel.FindOne(ctx, req.CatId)
+func (s *CatService) RetrieveCat(ctx context.Context, req *content.RetrieveCatReq) (res *content.RetrieveCatResp, err error) {
+	data, err := s.CatMongoMapper.FindOne(ctx, req.CatId)
 	switch err {
 	case nil:
-	case mapper.ErrNotFound:
+	case consts.ErrNotFound:
 		return nil, consts.ErrNoSuchCat
 	default:
 		return nil, err
 	}
-	cat := &collection.Cat{}
+	cat := &content.Cat{}
 	err = copier.Copy(cat, data)
 	if err != nil {
 		return nil, err
 	}
 	cat.Id = data.ID.Hex()
 	cat.CreateAt = data.CreateAt.Unix()
-	return &collection.RetrieveCatResp{Cat: cat}, nil
+	return &content.RetrieveCatResp{Cat: cat}, nil
 }
 
-func (s *CatServiceImpl) CreateCat(ctx context.Context, req *collection.CreateCatReq) (res *collection.CreateCatResp, err error) {
-	cat := &db.Cat{}
+func (s *CatService) CreateCat(ctx context.Context, req *content.CreateCatReq) (res *content.CreateCatResp, err error) {
+	cat := &catmapper.Cat{}
 	err = copier.Copy(cat, req.Cat)
 	if err != nil {
 		return nil, err
 	}
-	err = s.CatModel.Insert(ctx, cat)
+	err = s.CatMongoMapper.Insert(ctx, cat)
 	if err != nil {
 		return nil, err
 	}
-	return &collection.CreateCatResp{CatId: cat.ID.Hex()}, nil
+	return &content.CreateCatResp{CatId: cat.ID.Hex()}, nil
 }
 
-func (s *CatServiceImpl) UpdateCat(ctx context.Context, req *collection.UpdateCatReq) (res *collection.UpdateCatResp, err error) {
-	cat := &db.Cat{}
+func (s *CatService) UpdateCat(ctx context.Context, req *content.UpdateCatReq) (res *content.UpdateCatResp, err error) {
+	cat := &catmapper.Cat{}
 	err = copier.Copy(cat, req.Cat)
 	if err != nil {
 		return nil, err
@@ -114,17 +114,17 @@ func (s *CatServiceImpl) UpdateCat(ctx context.Context, req *collection.UpdateCa
 	if err != nil {
 		return nil, consts.ErrInvalidId
 	}
-	err = s.CatModel.Update(ctx, cat)
+	err = s.CatMongoMapper.Update(ctx, cat)
 	if err != nil {
 		return nil, err
 	}
-	return &collection.UpdateCatResp{}, nil
+	return &content.UpdateCatResp{}, nil
 }
 
-func (s *CatServiceImpl) DeleteCat(ctx context.Context, req *collection.DeleteCatReq) (res *collection.DeleteCatResp, err error) {
-	err = s.CatModel.Delete(ctx, req.CatId)
+func (s *CatService) DeleteCat(ctx context.Context, req *content.DeleteCatReq) (res *content.DeleteCatResp, err error) {
+	err = s.CatMongoMapper.Delete(ctx, req.CatId)
 	if err != nil {
 		return nil, err
 	}
-	return &collection.DeleteCatResp{}, nil
+	return &content.DeleteCatResp{}, nil
 }

@@ -2,10 +2,13 @@ package provider
 
 import (
 	"github.com/google/wire"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
 
-	"github.com/xh-polaris/meowchat-collection/biz/application/service"
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/mapper"
+	"github.com/xh-polaris/meowchat-content/biz/application/service"
 )
 
 var AllProvider = wire.NewSet(
@@ -16,6 +19,8 @@ var AllProvider = wire.NewSet(
 var ApplicationSet = wire.NewSet(
 	service.CatSet,
 	service.ImageSet,
+	service.MomentSet,
+	service.PostSet,
 )
 
 var InfrastructureSet = wire.NewSet(
@@ -24,6 +29,11 @@ var InfrastructureSet = wire.NewSet(
 )
 
 var MapperSet = wire.NewSet(
-	mapper.CatSet,
-	mapper.ImageSet,
+	cat.NewMongoMapper,
+	cat.NewEsMapper,
+	image.NewMongoMapper,
+	moment.NewMongoMapper,
+	moment.NewEsMapper,
+	post.NewMongoMapper,
+	post.NewEsMapper,
 )

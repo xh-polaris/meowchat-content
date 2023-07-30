@@ -1,16 +1,18 @@
-module github.com/xh-polaris/meowchat-collection
+module github.com/xh-polaris/meowchat-content
 
 go 1.18
 
 require (
+	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/hertz v0.6.6
 	github.com/cloudwego/kitex v0.6.1
-	github.com/elastic/go-elasticsearch/v8 v8.5.0
+	github.com/elastic/go-elasticsearch/v8 v8.7.0
 	github.com/google/wire v0.5.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230726095359-2c4cbd95c322
+	github.com/xh-polaris/paginator-go v1.0.2
+	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230804160714-3a65faec50b7
 	github.com/zeromicro/go-zero v1.5.4
 	go.mongodb.org/mongo-driver v1.12.0
 	google.golang.org/grpc v1.56.2
@@ -21,7 +23,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.4.0 // indirect
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
-	github.com/bytedance/sonic v1.8.8 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
@@ -30,10 +31,10 @@ require (
 	github.com/cloudwego/configmanager v0.2.0 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.6 // indirect
-	github.com/cloudwego/netpoll v0.4.0 // indirect
+	github.com/cloudwego/netpoll v0.4.1 // indirect
 	github.com/cloudwego/thriftgo v0.2.11 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.0.0-20211216131617-bbee439d559c // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.2.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -41,6 +42,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/pprof v0.0.0-20230509042627-b1315fad0c5a // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2 // indirect
 	github.com/jhump/protoreflect v1.15.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

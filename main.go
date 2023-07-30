@@ -3,17 +3,17 @@ package main
 import (
 	"net"
 
-	"github.com/xh-polaris/meowchat-collection/biz/infrastructure/util/log"
-	"github.com/xh-polaris/meowchat-collection/provider"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/log"
+	"github.com/xh-polaris/meowchat-content/provider"
 
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/collection/collection"
+	content "github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content/contentservice"
 )
 
 func main() {
-	s, err := provider.NewCollectionServerImpl()
+	s, err := provider.NewContentServerImpl()
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	svr := collection.NewServer(
+	svr := content.NewServer(
 		s,
 		server.WithServiceAddr(addr),
 		server.WithSuite(tracing.NewServerSuite()),
