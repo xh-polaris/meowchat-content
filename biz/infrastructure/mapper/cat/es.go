@@ -53,14 +53,16 @@ func (m *EsMapper) Search(ctx context.Context, communityId, keyword string, skip
 			Bool: &types.BoolQuery{
 				Must: []types.Query{
 					{
+						MultiMatch: &types.MultiMatchQuery{
+							Query:  keyword,
+							Fields: []string{consts.Details, consts.Name + "^5", consts.Area, consts.Color},
+						},
+					},
+					{
 						Term: map[string]types.TermQuery{
 							consts.CommunityId: {
 								Value: communityId,
 							},
-						},
-						MultiMatch: &types.MultiMatchQuery{
-							Query:  keyword,
-							Fields: []string{consts.Details, consts.Name + "^5", consts.Area, consts.Color},
 						},
 					},
 				},
