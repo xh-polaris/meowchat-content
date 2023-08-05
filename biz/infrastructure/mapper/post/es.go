@@ -10,10 +10,10 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/core/search"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/mitchellh/mapstructure"
+	"github.com/xh-polaris/gopkg/pagination"
+	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
-	"github.com/xh-polaris/paginator-go"
-	"github.com/xh-polaris/paginator-go/esp"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
@@ -22,7 +22,7 @@ import (
 
 type (
 	IEsMapper interface {
-		Search(ctx context.Context, query []types.Query, fopts *FilterOptions, popts *paginator.PaginationOptions, sorter any) ([]*Post, int64, error)
+		Search(ctx context.Context, query []types.Query, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter esp.EsCursor) ([]*Post, int64, error)
 		CountWithQuery(ctx context.Context, query []types.Query, fopts *FilterOptions) (int64, error)
 	}
 
@@ -67,8 +67,8 @@ func (m *EsMapper) CountWithQuery(ctx context.Context, query []types.Query, fopt
 	return res.Count, nil
 }
 
-func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *FilterOptions, popts *paginator.PaginationOptions, sorter any) ([]*Post, int64, error) {
-	p := esp.NewEsPaginator(paginator.NewRawStore(sorter), popts)
+func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter esp.EsCursor) ([]*Post, int64, error) {
+	p := esp.NewEsPaginator(pagination.NewRawStore(sorter), popts)
 	filter := newPostFilter(fopts)
 	s, sa, err := p.MakeSortOptions(ctx)
 	if err != nil {
@@ -125,7 +125,7 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 		}
 	}
 	if len(posts) > 0 {
-		err = p.StoreSorter(ctx, posts[0], posts[len(posts)-1])
+		err = p.StoreCursor(ctx, posts[0], posts[len(posts)-1])
 		if err != nil {
 			return nil, 0, err
 		}

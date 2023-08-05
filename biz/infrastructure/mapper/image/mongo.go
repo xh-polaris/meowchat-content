@@ -19,8 +19,6 @@ const prefixImageCacheKey = "cache:image:"
 const CollectionName = "image"
 
 type (
-	// IMongoMapper is an interface to be customized, add more methods here,
-	// and implement the added methods in MongoMapper.
 	IMongoMapper interface {
 		Insert(ctx context.Context, data *Image) error
 		FindOne(ctx context.Context, id string) (*Image, error)

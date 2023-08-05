@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"github.com/google/wire"
+	"github.com/xh-polaris/gopkg/pagination/esp"
+	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
-	"github.com/xh-polaris/paginator-go/esp"
-	"github.com/xh-polaris/paginator-go/mongop"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -40,16 +40,16 @@ func (s *MomentService) ListMoment(ctx context.Context, req *content.ListMomentR
 	filter := convertor.ParseMomentFilter(req.FilterOptions)
 	p := convertor.ParsePagination(req.PaginationOptions)
 	if req.SearchOptions == nil {
-		moments, total, err = s.MomentMongoMapper.FindManyAndCount(ctx, filter, p, &mongop.IdSorter{})
+		moments, total, err = s.MomentMongoMapper.FindManyAndCount(ctx, filter, p, mongop.IdCursorType)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		switch o := req.SearchOptions.Type.(type) {
 		case *content.SearchOptions_AllFieldsKey:
-			moments, total, err = s.MomentEsMapper.Search(ctx, convertor.ConvertMomentAllFieldsSearchQuery(o), filter, p, &esp.ScoreSorter{})
+			moments, total, err = s.MomentEsMapper.Search(ctx, convertor.ConvertMomentAllFieldsSearchQuery(o), filter, p, esp.ScoreCursorType)
 		case *content.SearchOptions_MultiFieldsKey:
-			moments, total, err = s.MomentEsMapper.Search(ctx, convertor.ConvertMomentMultiFieldsSearchQuery(o), filter, p, &esp.ScoreSorter{})
+			moments, total, err = s.MomentEsMapper.Search(ctx, convertor.ConvertMomentMultiFieldsSearchQuery(o), filter, p, esp.ScoreCursorType)
 		}
 		if err != nil {
 			return nil, err

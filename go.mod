@@ -6,7 +6,7 @@ require (
 	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/hertz v0.6.6
 	github.com/cloudwego/kitex v0.6.1
-	github.com/elastic/go-elasticsearch/v8 v8.7.0
+	github.com/elastic/go-elasticsearch/v8 v8.9.0
 	github.com/google/wire v0.5.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
@@ -36,6 +36,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.2.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v8 v8.11.6-0.20220405070650-99c79f7041fc // indirect
@@ -70,6 +71,7 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
+	github.com/xh-polaris/gopkg v0.0.0-20230805125627-ce41556a654d // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opentelemetry.io/otel v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.16.0 // indirect

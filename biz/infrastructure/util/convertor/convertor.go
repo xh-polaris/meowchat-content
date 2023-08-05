@@ -2,10 +2,10 @@ package convertor
 
 import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/xh-polaris/gopkg/pagination"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
-	"github.com/xh-polaris/paginator-go"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/basic"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 )
@@ -151,11 +151,11 @@ func ParsePostFilter(fopts *content.PostFilterOptions) *post.FilterOptions {
 	return &post.FilterOptions{}
 }
 
-func ParsePagination(opts *basic.PaginationOptions) (p *paginator.PaginationOptions) {
+func ParsePagination(opts *basic.PaginationOptions) (p *pagination.PaginationOptions) {
 	if opts == nil {
-		p = &paginator.PaginationOptions{}
+		p = &pagination.PaginationOptions{}
 	} else {
-		p = &paginator.PaginationOptions{
+		p = &pagination.PaginationOptions{
 			Limit:     opts.Limit,
 			Offset:    opts.Offset,
 			Backward:  opts.Backward,

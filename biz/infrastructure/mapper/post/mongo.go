@@ -2,13 +2,12 @@ package post
 
 import (
 	"context"
+	"github.com/xh-polaris/gopkg/pagination"
+	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"sync"
 	"time"
-
-	"github.com/xh-polaris/paginator-go"
-	"github.com/xh-polaris/paginator-go/mongop"
 
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,9 +24,9 @@ type (
 		FindOne(ctx context.Context, id string) (*Post, error)
 		Update(ctx context.Context, data *Post) error
 		Delete(ctx context.Context, id string) error
-		FindMany(ctx context.Context, fopts *FilterOptions, popts *paginator.PaginationOptions, sorter any) ([]*Post, error)
+		FindMany(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*Post, error)
 		Count(ctx context.Context, fopts *FilterOptions) (int64, error)
-		FindManyAndCount(ctx context.Context, fopts *FilterOptions, popts *paginator.PaginationOptions, sorter any) ([]*Post, int64, error)
+		FindManyAndCount(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*Post, int64, error)
 		UpdateFlags(ctx context.Context, id string, flags map[Flag]bool) error
 	}
 
@@ -106,8 +105,8 @@ func (m *MongoMapper) UpdateFlags(ctx context.Context, id string, flags map[Flag
 	return nil
 }
 
-func (m *MongoMapper) FindMany(ctx context.Context, fopts *FilterOptions, popts *paginator.PaginationOptions, sorter any) ([]*Post, error) {
-	p := mongop.NewMongoPaginator(paginator.NewRawStore(sorter), popts)
+func (m *MongoMapper) FindMany(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*Post, error) {
+	p := mongop.NewMongoPaginator(pagination.NewRawStore(sorter), popts)
 
 	filter := MakeBsonFilter(fopts)
 	sort, err := p.MakeSortOptions(ctx, filter)
@@ -131,7 +130,7 @@ func (m *MongoMapper) FindMany(ctx context.Context, fopts *FilterOptions, popts 
 		}
 	}
 	if len(data) > 0 {
-		err = p.StoreSorter(ctx, data[0], data[len(data)-1])
+		err = p.StoreCursor(ctx, data[0], data[len(data)-1])
 		if err != nil {
 			return nil, err
 		}
@@ -144,7 +143,7 @@ func (m *MongoMapper) Count(ctx context.Context, filter *FilterOptions) (int64, 
 	return m.conn.CountDocuments(ctx, f)
 }
 
-func (m *MongoMapper) FindManyAndCount(ctx context.Context, fopts *FilterOptions, popts *paginator.PaginationOptions, sorter any) ([]*Post, int64, error) {
+func (m *MongoMapper) FindManyAndCount(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*Post, int64, error) {
 	var posts []*Post
 	var total int64
 	wg := sync.WaitGroup{}

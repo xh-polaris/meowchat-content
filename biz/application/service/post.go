@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"github.com/google/wire"
+	"github.com/xh-polaris/gopkg/pagination/esp"
+	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
-	"github.com/xh-polaris/paginator-go/esp"
-	"github.com/xh-polaris/paginator-go/mongop"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -97,16 +97,16 @@ func (s *PostService) ListPost(ctx context.Context, req *content.ListPostReq) (*
 	p := convertor.ParsePagination(req.PaginationOptions)
 
 	if req.SearchOptions == nil {
-		posts, total, err = s.PostMongoMapper.FindManyAndCount(ctx, filter, p, &mongop.IdSorter{})
+		posts, total, err = s.PostMongoMapper.FindManyAndCount(ctx, filter, p, mongop.IdCursorType)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		switch o := req.SearchOptions.Type.(type) {
 		case *content.SearchOptions_AllFieldsKey:
-			posts, total, err = s.PostEsMapper.Search(ctx, convertor.ConvertPostAllFieldsSearchQuery(o), filter, p, &esp.ScoreSorter{})
+			posts, total, err = s.PostEsMapper.Search(ctx, convertor.ConvertPostAllFieldsSearchQuery(o), filter, p, esp.ScoreCursorType)
 		case *content.SearchOptions_MultiFieldsKey:
-			posts, total, err = s.PostEsMapper.Search(ctx, convertor.ConvertPostMultiFieldsSearchQuery(o), filter, p, &esp.ScoreSorter{})
+			posts, total, err = s.PostEsMapper.Search(ctx, convertor.ConvertPostMultiFieldsSearchQuery(o), filter, p, esp.ScoreCursorType)
 		}
 		if err != nil {
 			return nil, err
