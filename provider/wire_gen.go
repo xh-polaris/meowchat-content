@@ -13,6 +13,7 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
 )
 
@@ -45,12 +46,19 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		PostMongoMapper: postIMongoMapper,
 		PostEsMapper:    postIEsMapper,
 	}
+	planIMongoMapper := plan.NewMongoMapper(configConfig)
+	planIEsMapper := plan.NewEsMapper(configConfig)
+	planService := &service.PlanService{
+		PlanMongoMapper: planIMongoMapper,
+		PlanEsMapper:    planIEsMapper,
+	}
 	contentServerImpl := &adaptor.ContentServerImpl{
 		Config:        configConfig,
 		CatService:    catService,
 		ImageService:  imageService,
 		MomentService: momentService,
 		PostService:   postService,
+		PlanService:   planService,
 	}
 	return contentServerImpl, nil
 }

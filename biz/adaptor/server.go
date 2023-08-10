@@ -14,6 +14,35 @@ type ContentServerImpl struct {
 	ImageService  service.IImageService
 	MomentService service.IMomentService
 	PostService   service.IPostService
+	PlanService   service.IPlanService
+}
+
+func (s *ContentServerImpl) ListPlan(ctx context.Context, req *content.ListPlanReq) (res *content.ListPlanResp, err error) {
+	return s.PlanService.ListPlan(ctx, req)
+
+}
+
+func (s *ContentServerImpl) CountPlan(ctx context.Context, req *content.CountPlanReq) (res *content.CountPlanResp, err error) {
+	return s.PlanService.CountPlan(ctx, req)
+
+}
+
+func (s *ContentServerImpl) RetrievePlan(ctx context.Context, req *content.RetrievePlanReq) (res *content.RetrievePlanResp, err error) {
+	return s.PlanService.RetrievePlan(ctx, req)
+
+}
+
+func (s *ContentServerImpl) CreatePlan(ctx context.Context, req *content.CreatePlanReq) (res *content.CreatePlanResp, err error) {
+	return s.PlanService.CreatePlan(ctx, req)
+
+}
+
+func (s *ContentServerImpl) UpdatePlan(ctx context.Context, req *content.UpdatePlanReq) (res *content.UpdatePlanResp, err error) {
+	return s.PlanService.UpdatePlan(ctx, req)
+}
+
+func (s *ContentServerImpl) DeletePlan(ctx context.Context, req *content.DeletePlanReq) (res *content.DeletePlanResp, err error) {
+	return s.PlanService.DeletePlan(ctx, req)
 }
 
 func (s *ContentServerImpl) SearchCat(ctx context.Context, req *content.SearchCatReq) (res *content.SearchCatResp, err error) {

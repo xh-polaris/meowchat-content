@@ -5,6 +5,7 @@ import (
 	"github.com/xh-polaris/gopkg/pagination"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/basic"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
@@ -38,6 +39,21 @@ func ConvertMoment(data *moment.Moment) *content.Moment {
 		UserId:      data.UserId,
 		CommunityId: data.CommunityId,
 		CatId:       data.CatId,
+	}
+}
+
+func ConvertPlan(data *plan.Plan) *content.Plan {
+	return &content.Plan{
+		Id:           data.ID.Hex(),
+		CreateAt:     data.CreateAt.Unix(),
+		PlanType:     data.PlanType,
+		EndTime:      data.EndTime.Unix(),
+		Description:  data.Description,
+		StartTime:    data.StartTime.Unix(),
+		InitiatorIds: data.InitiatorIds,
+		CatId:        data.CatId,
+		ImageUrls:    data.ImageUrls,
+		Name:         data.Name,
 	}
 }
 
@@ -79,6 +95,38 @@ func ConvertMomentMultiFieldsSearchQuery(in *content.SearchOptions_MultiFieldsKe
 		q = append(q, types.Query{
 			Match: map[string]types.MatchQuery{
 				consts.Text: {
+					Query: *in.MultiFieldsKey.Text,
+				},
+			},
+		})
+	}
+	return q
+}
+
+func ConvertPlanAllFieldsSearchQuery(in *content.SearchOptions_AllFieldsKey) []types.Query {
+	return []types.Query{{
+		MultiMatch: &types.MultiMatchQuery{
+			Query:  in.AllFieldsKey,
+			Fields: []string{consts.Name + "^3", consts.Description},
+		}},
+	}
+}
+
+func ConvertPlanMultiFieldsSearchQuery(in *content.SearchOptions_MultiFieldsKey) []types.Query {
+	var q []types.Query
+	if in.MultiFieldsKey.Title != nil {
+		q = append(q, types.Query{
+			Match: map[string]types.MatchQuery{
+				consts.Name: {
+					Query: *in.MultiFieldsKey.Title + "^3",
+				},
+			},
+		})
+	}
+	if in.MultiFieldsKey.Text != nil {
+		q = append(q, types.Query{
+			Match: map[string]types.MatchQuery{
+				consts.Description: {
 					Query: *in.MultiFieldsKey.Text,
 				},
 			},
@@ -136,6 +184,18 @@ func ParseMomentFilter(opts *content.MomentFilterOptions) (filter *moment.Filter
 			OnlyUserId:       opts.OnlyUserId,
 			OnlyCommunityId:  opts.OnlyCommunityId,
 			OnlyCommunityIds: opts.OnlyCommunityIds,
+		}
+	}
+	return
+}
+
+func ParsePlanFilter(opts *content.PlanFilterOptions) (filter *plan.FilterOptions) {
+	if opts == nil {
+		filter = &plan.FilterOptions{}
+	} else {
+		filter = &plan.FilterOptions{
+			OnlyUserId: opts.OnlyUserId,
+			OnlyCatId:  opts.OnlyCatId,
 		}
 	}
 	return

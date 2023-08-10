@@ -6,6 +6,7 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
 
 	"github.com/xh-polaris/meowchat-content/biz/application/service"
@@ -21,6 +22,7 @@ var ApplicationSet = wire.NewSet(
 	service.ImageSet,
 	service.MomentSet,
 	service.PostSet,
+	service.PlanSet,
 )
 
 var InfrastructureSet = wire.NewSet(
@@ -36,4 +38,6 @@ var MapperSet = wire.NewSet(
 	moment.NewEsMapper,
 	post.NewMongoMapper,
 	post.NewEsMapper,
+	plan.NewMongoMapper,
+	plan.NewEsMapper,
 )
