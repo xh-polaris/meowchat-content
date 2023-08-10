@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/bytedance/sonic v1.8.8
-	github.com/cloudwego/hertz v0.6.6
+	github.com/cloudwego/hertz v0.6.7
 	github.com/cloudwego/kitex v0.6.1
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
 	github.com/google/wire v0.5.0
