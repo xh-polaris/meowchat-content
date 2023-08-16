@@ -7,7 +7,7 @@ import (
 	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/donate"
-	Fish "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/fish"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/fish"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
@@ -33,7 +33,7 @@ type PlanService struct {
 	PlanMongoMapper   plan.IMongoMapper
 	PlanEsMapper      plan.IEsMapper
 	DonateMongoMapper donate.IMongoMapper
-	FishMongoMapper   Fish.IMongoMapper
+	FishMongoMapper   fish.IMongoMapper
 }
 
 var PlanSet = wire.NewSet(
@@ -211,7 +211,7 @@ func (s *PlanService) AddUserFish(ctx context.Context, req *content.AddUserFishR
 		if err != nil {
 			return nil, err
 		}
-		err = s.FishMongoMapper.Insert(ctx, &Fish.Fish{
+		err = s.FishMongoMapper.Insert(ctx, &fish.Fish{
 			UserId:  oid,
 			FishNum: req.Fish,
 		})
