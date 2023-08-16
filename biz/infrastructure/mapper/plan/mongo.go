@@ -43,6 +43,8 @@ type (
 		InitiatorIds []string           `bson:"initiatorIds,omitempty"`
 		StartTime    time.Time          `bson:"startTime,omitempty" json:"startTime,omitempty"`
 		EndTime      time.Time          `bson:"endTime,omitempty" json:"endTime,omitempty"`
+		MaxFish      int64              `bson:"maxFish,omitempty" json:"maxFish,omitempty"`
+		NowFish      int64              `bson:"nowFish,omitempty" json:"nowFish,omitempty"`
 
 		UpdateAt time.Time `bson:"updateAt,omitempty" json:"updateAt,omitempty"`
 		CreateAt time.Time `bson:"createAt,omitempty" json:"createAt,omitempty"`

@@ -17,6 +17,26 @@ type ContentServerImpl struct {
 	PlanService   service.IPlanService
 }
 
+func (s *ContentServerImpl) DonateFish(ctx context.Context, req *content.DonateFishReq) (res *content.DonateFishResp, err error) {
+	return s.PlanService.DonateFish(ctx, req)
+
+}
+
+func (s *ContentServerImpl) AddUserFish(ctx context.Context, req *content.AddUserFishReq) (res *content.AddUserFishResp, err error) {
+	return s.PlanService.AddUserFish(ctx, req)
+
+}
+
+func (s *ContentServerImpl) ListFishByPlan(ctx context.Context, req *content.ListFishByPlanReq) (res *content.ListFishByPlanResp, err error) {
+	return s.PlanService.ListFishByPlan(ctx, req)
+
+}
+
+func (s *ContentServerImpl) RetrieveUserFish(ctx context.Context, req *content.RetrieveUserFishReq) (res *content.RetrieveUserFishResp, err error) {
+	return s.PlanService.RetrieveUserFish(ctx, req)
+
+}
+
 func (s *ContentServerImpl) ListPlan(ctx context.Context, req *content.ListPlanReq) (res *content.ListPlanResp, err error) {
 	return s.PlanService.ListPlan(ctx, req)
 

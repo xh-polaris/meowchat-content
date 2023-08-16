@@ -4,6 +4,8 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/donate"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/fish"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
@@ -40,4 +42,6 @@ var MapperSet = wire.NewSet(
 	post.NewEsMapper,
 	plan.NewMongoMapper,
 	plan.NewEsMapper,
+	fish.NewMongoMapper,
+	donate.NewMongoMapper,
 )

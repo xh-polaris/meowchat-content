@@ -6,10 +6,13 @@ import (
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/donate"
+	Fish "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/fish"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"sort"
 	"time"
 )
 
@@ -20,11 +23,17 @@ type IPlanService interface {
 	CreatePlan(ctx context.Context, req *content.CreatePlanReq) (*content.CreatePlanResp, error)
 	UpdatePlan(ctx context.Context, req *content.UpdatePlanReq) (*content.UpdatePlanResp, error)
 	DeletePlan(ctx context.Context, req *content.DeletePlanReq) (*content.DeletePlanResp, error)
+	DonateFish(ctx context.Context, req *content.DonateFishReq) (*content.DonateFishResp, error)
+	AddUserFish(ctx context.Context, req *content.AddUserFishReq) (*content.AddUserFishResp, error)
+	ListFishByPlan(ctx context.Context, req *content.ListFishByPlanReq) (*content.ListFishByPlanResp, error)
+	RetrieveUserFish(ctx context.Context, req *content.RetrieveUserFishReq) (*content.RetrieveUserFishResp, error)
 }
 
 type PlanService struct {
-	PlanMongoMapper plan.IMongoMapper
-	PlanEsMapper    plan.IEsMapper
+	PlanMongoMapper   plan.IMongoMapper
+	PlanEsMapper      plan.IEsMapper
+	DonateMongoMapper donate.IMongoMapper
+	FishMongoMapper   Fish.IMongoMapper
 }
 
 var PlanSet = wire.NewSet(
@@ -42,7 +51,6 @@ func (s *PlanService) ListPlan(ctx context.Context, req *content.ListPlanReq) (*
 	p := convertor.ParsePagination(req.PaginationOptions)
 	if req.SearchOptions == nil {
 		plans, total, err = s.PlanMongoMapper.FindManyAndCount(ctx, filter, p, mongop.IdCursorType)
-		print(plans)
 		if err != nil {
 			return nil, err
 		}
@@ -154,4 +162,101 @@ func (s *PlanService) DeletePlan(ctx context.Context, req *content.DeletePlanReq
 		return nil, err
 	}
 	return &content.DeletePlanResp{}, nil
+}
+
+func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq) (*content.DonateFishResp, error) {
+	data, err := s.FishMongoMapper.FindOne(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	data.FishNum = data.FishNum - req.Fish
+	err = s.FishMongoMapper.Update(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.DonateMongoMapper.Insert(ctx, &donate.Donate{
+		UserId:  req.UserId,
+		PlanId:  req.PlanId,
+		FishNum: req.Fish,
+	})
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.PlanMongoMapper.FindOne(ctx, req.PlanId)
+	if err != nil {
+		return nil, err
+	}
+	res.NowFish = res.NowFish + req.Fish
+	err = s.PlanMongoMapper.Update(ctx, res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &content.DonateFishResp{}, nil
+}
+
+func (s *PlanService) AddUserFish(ctx context.Context, req *content.AddUserFishReq) (*content.AddUserFishResp, error) {
+	data, err := s.FishMongoMapper.FindOne(ctx, req.UserId)
+	switch err {
+	case nil:
+		data.FishNum = data.FishNum + req.Fish
+		err = s.FishMongoMapper.Update(ctx, data)
+		if err != nil {
+			return nil, err
+		}
+		return &content.AddUserFishResp{}, nil
+	case consts.ErrNotFound:
+		oid, err := primitive.ObjectIDFromHex(req.UserId)
+		if err != nil {
+			return nil, err
+		}
+		err = s.FishMongoMapper.Insert(ctx, &Fish.Fish{
+			UserId:  oid,
+			FishNum: req.Fish,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &content.AddUserFishResp{}, nil
+	default:
+		return nil, err
+	}
+}
+
+func (s *PlanService) ListFishByPlan(ctx context.Context, req *content.ListFishByPlanReq) (*content.ListFishByPlanResp, error) {
+	data, err := s.DonateMongoMapper.ListDonateByPlan(ctx, req.PlanId)
+	if err != nil {
+		return nil, err
+	}
+	fishMap := make(map[string]int64, len(data))
+	userIds := make([]string, 0, len(data))
+	for _, value := range data {
+		i, ok := fishMap[value.UserId]
+		if ok == true {
+			fishMap[value.UserId] = value.FishNum + i
+		} else {
+			fishMap[value.UserId] = value.FishNum
+			userIds = append(userIds, value.UserId)
+		}
+	}
+	sort.Slice(userIds, func(i, j int) bool {
+		return fishMap[userIds[i]] > fishMap[userIds[j]]
+	})
+	return &content.ListFishByPlanResp{
+		UserIds: userIds,
+		FishMap: fishMap,
+	}, nil
+}
+
+func (s *PlanService) RetrieveUserFish(ctx context.Context, req *content.RetrieveUserFishReq) (*content.RetrieveUserFishResp, error) {
+	data, err := s.FishMongoMapper.FindOne(ctx, req.UserId)
+	switch err {
+	case nil:
+		return &content.RetrieveUserFishResp{Fish: data.FishNum}, nil
+	case consts.ErrNotFound:
+		return &content.RetrieveUserFishResp{Fish: 0}, nil
+	default:
+		return nil, err
+	}
 }

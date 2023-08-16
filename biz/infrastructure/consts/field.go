@@ -20,4 +20,6 @@ const (
 	StartTime    = "startTime"
 	EndTime      = "endTime"
 	InitiatorIds = "initiatorIds"
+	PlanId       = "planId"
+	FishNum      = "fishNum"
 )
