@@ -10,7 +10,7 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/xh-polaris/gopkg v0.0.0-20230805125627-ce41556a654d
 	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230819155341-4a3ac3fe3b89
 	github.com/zeromicro/go-zero v1.5.4
