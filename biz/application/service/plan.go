@@ -12,6 +12,7 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"sort"
 	"time"
 )
@@ -165,33 +166,51 @@ func (s *PlanService) DeletePlan(ctx context.Context, req *content.DeletePlanReq
 }
 
 func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq) (*content.DonateFishResp, error) {
-	data, err := s.FishMongoMapper.FindOne(ctx, req.UserId)
-	if err != nil {
-		return nil, err
-	}
-	data.FishNum = data.FishNum - req.Fish
-	err = s.FishMongoMapper.Update(ctx, data)
+	dbClient, err := s.FishMongoMapper.StartClient(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.DonateMongoMapper.Insert(ctx, &donate.Donate{
-		UserId:  req.UserId,
-		PlanId:  req.PlanId,
-		FishNum: req.Fish,
+	err = dbClient.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		err = sessionContext.StartTransaction()
+		if err != nil {
+			return err
+		}
+		err = s.FishMongoMapper.Add(sessionContext, req.UserId, -req.Fish)
+		if err != nil {
+			return err
+		}
+
+		err = s.DonateMongoMapper.Insert(sessionContext, &donate.Donate{
+			UserId:  req.UserId,
+			PlanId:  req.PlanId,
+			FishNum: req.Fish,
+		})
+		if err != nil {
+			err = sessionContext.AbortTransaction(sessionContext)
+			if err != nil {
+				return err
+			}
+			return err
+		}
+		err = s.PlanMongoMapper.Add(sessionContext, req.PlanId, req.Fish)
+		if err != nil {
+			err = sessionContext.AbortTransaction(sessionContext)
+			if err != nil {
+				return err
+			}
+			return err
+		}
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			err = sessionContext.AbortTransaction(sessionContext)
+			if err != nil {
+				return err
+			}
+			return err
+		}
+		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.PlanMongoMapper.FindOne(ctx, req.PlanId)
-	if err != nil {
-		return nil, err
-	}
-	res.NowFish = res.NowFish + req.Fish
-	err = s.PlanMongoMapper.Update(ctx, res)
-	if err != nil {
-		return nil, err
-	}
 
 	return &content.DonateFishResp{}, nil
 }

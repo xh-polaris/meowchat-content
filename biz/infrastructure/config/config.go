@@ -4,6 +4,7 @@ import (
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"os"
 )
 
@@ -22,6 +23,8 @@ type Config struct {
 	}
 	Cache         cache.CacheConf
 	Elasticsearch ElasticsearchConf
+	Redis         *redis.RedisConf
+	GetFishTimes  int64
 }
 
 func NewConfig() (*Config, error) {

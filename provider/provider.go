@@ -10,6 +10,7 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/stores/redis"
 
 	"github.com/xh-polaris/meowchat-content/biz/application/service"
 )
@@ -29,6 +30,7 @@ var ApplicationSet = wire.NewSet(
 
 var InfrastructureSet = wire.NewSet(
 	config.NewConfig,
+	redis.NewRedis,
 	MapperSet,
 )
 

@@ -5,11 +5,15 @@ import (
 	"github.com/google/wire"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strconv"
+	"time"
 )
 
 type IMomentService interface {
@@ -22,8 +26,10 @@ type IMomentService interface {
 }
 
 type MomentService struct {
+	Config            *config.Config
 	MomentMongoMapper moment.IMongoMapper
 	MomentEsMapper    moment.IEsMapper
+	Redis             *redis.Redis
 }
 
 var MomentSet = wire.NewSet(
@@ -102,6 +108,7 @@ func (s *MomentService) RetrieveMoment(ctx context.Context, req *content.Retriev
 }
 
 func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMomentReq) (*content.CreateMomentResp, error) {
+	resp := new(content.CreateMomentResp)
 	m := req.Moment
 	data := &moment.Moment{
 		Photos:      m.Photos,
@@ -117,7 +124,66 @@ func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMom
 		return nil, err
 	}
 
-	return &content.CreateMomentResp{MomentId: data.ID.Hex()}, nil
+	resp.MomentId = data.ID.Hex()
+	t, err := s.Redis.GetCtx(ctx, "contentTimes"+m.UserId)
+	if err != nil {
+		return resp, nil
+	}
+	r, err := s.Redis.GetCtx(ctx, "contentDate"+m.UserId)
+	if err != nil {
+		return resp, nil
+	} else if r == "" {
+		resp.GetFish = true
+		resp.GetFishTimes = 1
+		err = s.Redis.SetexCtx(ctx, "contentTimes"+m.UserId, "1", 86400)
+		if err != nil {
+			resp.GetFish = false
+			return resp, nil
+		}
+		err = s.Redis.SetexCtx(ctx, "contentDate"+m.UserId, strconv.FormatInt(time.Now().Unix(), 10), 86400)
+		if err != nil {
+			resp.GetFish = false
+			return resp, nil
+		}
+	} else {
+		times, err := strconv.ParseInt(t, 10, 64)
+		if err != nil {
+			return resp, nil
+		}
+		resp.GetFishTimes = times + 1
+		date, err := strconv.ParseInt(r, 10, 64)
+		if err != nil {
+			return resp, nil
+		}
+		lastTime := time.Unix(date, 0)
+		err = s.Redis.SetexCtx(ctx, "contentTimes"+m.UserId, strconv.FormatInt(times+1, 10), 86400)
+		if err != nil {
+			return resp, nil
+		}
+		err = s.Redis.SetexCtx(ctx, "contentDate"+m.UserId, strconv.FormatInt(time.Now().Unix(), 10), 86400)
+		if err != nil {
+			return resp, nil
+		}
+		if lastTime.Day() == time.Now().Day() && lastTime.Month() == time.Now().Month() && lastTime.Year() == time.Now().Year() {
+			err = s.Redis.SetexCtx(ctx, "contentTimes"+m.UserId, strconv.FormatInt(times+1, 10), 86400)
+			if err != nil {
+				return resp, nil
+			}
+			if times >= s.Config.GetFishTimes {
+				resp.GetFish = false
+			} else {
+				resp.GetFish = true
+			}
+		} else {
+			err = s.Redis.SetexCtx(ctx, "contentTimes"+m.UserId, "1", 86400)
+			if err != nil {
+				return resp, nil
+			}
+			resp.GetFish = true
+			resp.GetFishTimes = 1
+		}
+	}
+	return resp, nil
 }
 
 func (s *MomentService) UpdateMoment(ctx context.Context, req *content.UpdateMomentReq) (*content.UpdateMomentResp, error) {

@@ -17,6 +17,7 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/stores/redis"
 )
 
 // Injectors from wire.go:
@@ -38,15 +39,20 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 	}
 	momentIMongoMapper := moment.NewMongoMapper(configConfig)
 	momentIEsMapper := moment.NewEsMapper(configConfig)
+	redisRedis := redis.NewRedis(configConfig)
 	momentService := &service.MomentService{
+		Config:            configConfig,
 		MomentMongoMapper: momentIMongoMapper,
 		MomentEsMapper:    momentIEsMapper,
+		Redis:             redisRedis,
 	}
 	postIMongoMapper := post.NewMongoMapper(configConfig)
 	postIEsMapper := post.NewEsMapper(configConfig)
 	postService := &service.PostService{
+		Config:          configConfig,
 		PostMongoMapper: postIMongoMapper,
 		PostEsMapper:    postIEsMapper,
+		Redis:           redisRedis,
 	}
 	planIMongoMapper := plan.NewMongoMapper(configConfig)
 	planIEsMapper := plan.NewEsMapper(configConfig)

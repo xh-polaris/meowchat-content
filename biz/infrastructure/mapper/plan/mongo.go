@@ -24,6 +24,7 @@ type (
 		FindOne(ctx context.Context, id string) (*Plan, error)
 		Update(ctx context.Context, data *Plan) error
 		Delete(ctx context.Context, id string) error
+		Add(ctx context.Context, id string, add int64) error
 		FindMany(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*Plan, error)
 		Count(ctx context.Context, filter *FilterOptions) (int64, error)
 		FindManyAndCount(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*Plan, int64, error)
@@ -179,5 +180,13 @@ func (m *MongoMapper) Delete(ctx context.Context, id string) error {
 	}
 	key := prefixPlanCacheKey + id
 	_, err = m.conn.DeleteOne(ctx, key, bson.M{consts.ID: oid})
+	return err
+}
+
+func (m *MongoMapper) Add(ctx context.Context, id string, add int64) error {
+	key := prefixPlanCacheKey + id
+	filter := bson.M{consts.ID: id}
+	update := bson.M{"$inc": bson.M{consts.FishNum: add}, "$set": bson.M{consts.UpdateAt: time.Now()}}
+	_, err := m.conn.UpdateOne(ctx, key, filter, update)
 	return err
 }

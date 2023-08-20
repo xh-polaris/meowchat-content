@@ -3,6 +3,7 @@ package fish
 import (
 	"context"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
+	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
@@ -22,6 +23,8 @@ type (
 		FindOne(ctx context.Context, id string) (*Fish, error)
 		Update(ctx context.Context, data *Fish) error
 		Delete(ctx context.Context, id string) error
+		Add(ctx context.Context, id string, add int64) error
+		StartClient(ctx context.Context) (*mongo.Client, error)
 	}
 
 	MongoMapper struct {
@@ -85,4 +88,17 @@ func (m *MongoMapper) Delete(ctx context.Context, id string) error {
 	key := prefixFishCacheKey + id
 	_, err = m.conn.DeleteOne(ctx, key, bson.M{consts.ID: oid})
 	return err
+}
+
+func (m *MongoMapper) Add(ctx context.Context, id string, add int64) error {
+	key := prefixFishCacheKey + id
+	filter := bson.M{consts.ID: id}
+	update := bson.M{"$inc": bson.M{consts.FishNum: add}, "$set": bson.M{consts.UpdateAt: time.Now()}}
+	_, err := m.conn.UpdateOne(ctx, key, filter, update)
+	return err
+}
+
+func (m *MongoMapper) StartClient(ctx context.Context) (*mongo.Client, error) {
+	client := m.conn.Database().Client()
+	return client, nil
 }
