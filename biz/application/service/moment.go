@@ -137,7 +137,7 @@ func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMom
 		sendUrl, _ := url.Parse(u)
 		urls = append(urls, *sendUrl)
 	}
-	go s.SendDelayMessage(s.Config, urls)
+	go s.SendDelayMessage(urls)
 
 	//小鱼干奖励
 	t, err := s.Redis.GetCtx(ctx, "contentTimes"+m.UserId)
@@ -221,6 +221,14 @@ func (s *MomentService) UpdateMoment(ctx context.Context, req *content.UpdateMom
 		return nil, err
 	}
 
+	//发送使用url信息
+	var urls []url.URL
+	for _, u := range m.Photos {
+		sendUrl, _ := url.Parse(u)
+		urls = append(urls, *sendUrl)
+	}
+	go s.SendDelayMessage(urls)
+
 	return &content.UpdateMomentResp{}, nil
 }
 
@@ -232,7 +240,7 @@ func (s *MomentService) DeleteMoment(ctx context.Context, req *content.DeleteMom
 	return &content.DeleteMomentResp{}, nil
 }
 
-func (s *MomentService) SendDelayMessage(c *config.Config, message interface{}) {
+func (s *MomentService) SendDelayMessage(message interface{}) {
 	json, _ := jsonx.Marshal(message)
 	msg := &mqprimitive.Message{
 		Topic: "sts_used_url",

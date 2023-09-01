@@ -62,7 +62,7 @@ func (s *PostService) CreatePost(ctx context.Context, req *content.CreatePostReq
 	var urls []url.URL
 	u, _ := url.Parse(req.CoverUrl)
 	urls = append(urls, *u)
-	go s.SendDelayMessage(s.Config, urls)
+	go s.SendDelayMessage(urls)
 
 	//小鱼干奖励
 	data, err := s.Redis.GetCtx(ctx, "contentTimes"+req.UserId)
@@ -154,6 +154,12 @@ func (s *PostService) UpdatePost(ctx context.Context, req *content.UpdatePostReq
 		return nil, err
 	}
 
+	//发送使用url信息
+	var urls []url.URL
+	u, _ := url.Parse(req.CoverUrl)
+	urls = append(urls, *u)
+	go s.SendDelayMessage(urls)
+
 	return &content.UpdatePostResp{}, nil
 }
 
@@ -239,7 +245,7 @@ func (s *PostService) SetOfficial(ctx context.Context, req *content.SetOfficialR
 	return &content.SetOfficialResp{}, nil
 }
 
-func (s *PostService) SendDelayMessage(c *config.Config, message interface{}) {
+func (s *PostService) SendDelayMessage(message interface{}) {
 	json, _ := jsonx.Marshal(message)
 	msg := &mqprimitive.Message{
 		Topic: "sts_used_url",

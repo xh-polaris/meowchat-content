@@ -2,6 +2,11 @@ package service
 
 import (
 	"context"
+	"github.com/apache/rocketmq-client-go/v2"
+	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
+	"github.com/zeromicro/go-zero/core/jsonx"
+	"net/url"
 
 	imagemapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 
@@ -16,7 +21,9 @@ type IImageService interface {
 }
 
 type ImageService struct {
+	Config     *config.Config
 	ImageModel imagemapper.IMongoMapper
+	MqProducer rocketmq.Producer
 }
 
 var ImageSet = wire.NewSet(
@@ -40,6 +47,15 @@ func (s *ImageService) CreateImage(ctx context.Context, req *content.CreateImage
 	for i := 0; i < len(data); i++ {
 		id[i] = data[i].ID.Hex()
 	}
+
+	//发送使用url信息
+	var urls []url.URL
+	for i := 0; i < len(data); i++ {
+		sendUrl, _ := url.Parse(req.Images[i].Url)
+		urls = append(urls, *sendUrl)
+	}
+	go s.SendDelayMessage(urls)
+
 	return &content.CreateImageResp{ImageIds: id}, nil
 }
 
@@ -79,4 +95,22 @@ func (s *ImageService) ListImage(ctx context.Context, req *content.ListImageReq)
 		return nil, err
 	}
 	return &content.ListImageResp{Images: imageList, Total: total}, nil
+}
+
+func (s *ImageService) SendDelayMessage(message interface{}) {
+	json, _ := jsonx.Marshal(message)
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+
+	res, err := s.MqProducer.SendSync(context.Background(), msg)
+	if err != nil || res.Status != mqprimitive.SendOK {
+		for i := 0; i < 2; i++ {
+			res, err := s.MqProducer.SendSync(context.Background(), msg)
+			if err == nil && res.Status == mqprimitive.SendOK {
+				break
+			}
+		}
+	}
 }
