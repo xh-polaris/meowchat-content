@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"github.com/apache/rocketmq-client-go/v2"
+	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/google/wire"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
@@ -10,8 +12,10 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
+	"github.com/zeromicro/go-zero/core/jsonx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -30,6 +34,7 @@ type MomentService struct {
 	MomentMongoMapper moment.IMongoMapper
 	MomentEsMapper    moment.IEsMapper
 	Redis             *redis.Redis
+	MqProducer        rocketmq.Producer
 }
 
 var MomentSet = wire.NewSet(
@@ -125,6 +130,16 @@ func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMom
 	}
 
 	resp.MomentId = data.ID.Hex()
+
+	//发送使用url信息
+	var urls []url.URL
+	for _, u := range m.Photos {
+		sendUrl, _ := url.Parse(u)
+		urls = append(urls, *sendUrl)
+	}
+	go s.SendDelayMessage(s.Config, urls)
+
+	//小鱼干奖励
 	t, err := s.Redis.GetCtx(ctx, "contentTimes"+m.UserId)
 	if err != nil {
 		return resp, nil
@@ -215,4 +230,22 @@ func (s *MomentService) DeleteMoment(ctx context.Context, req *content.DeleteMom
 		return nil, err
 	}
 	return &content.DeleteMomentResp{}, nil
+}
+
+func (s *MomentService) SendDelayMessage(c *config.Config, message interface{}) {
+	json, _ := jsonx.Marshal(message)
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+
+	res, err := s.MqProducer.SendSync(context.Background(), msg)
+	if err != nil || res.Status != mqprimitive.SendOK {
+		for i := 0; i < 2; i++ {
+			res, err := s.MqProducer.SendSync(context.Background(), msg)
+			if err == nil && res.Status == mqprimitive.SendOK {
+				break
+			}
+		}
+	}
 }

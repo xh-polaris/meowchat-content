@@ -17,6 +17,7 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mq"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/stores/redis"
 )
 
@@ -40,11 +41,16 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 	momentIMongoMapper := moment.NewMongoMapper(configConfig)
 	momentIEsMapper := moment.NewEsMapper(configConfig)
 	redisRedis := redis.NewRedis(configConfig)
+	producer, err := mq.NewMqProducer(configConfig)
+	if err != nil {
+		return nil, err
+	}
 	momentService := &service.MomentService{
 		Config:            configConfig,
 		MomentMongoMapper: momentIMongoMapper,
 		MomentEsMapper:    momentIEsMapper,
 		Redis:             redisRedis,
+		MqProducer:        producer,
 	}
 	postIMongoMapper := post.NewMongoMapper(configConfig)
 	postIEsMapper := post.NewEsMapper(configConfig)
@@ -53,6 +59,7 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		PostMongoMapper: postIMongoMapper,
 		PostEsMapper:    postIEsMapper,
 		Redis:           redisRedis,
+		MqProducer:      producer,
 	}
 	planIMongoMapper := plan.NewMongoMapper(configConfig)
 	planIEsMapper := plan.NewEsMapper(configConfig)

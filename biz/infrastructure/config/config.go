@@ -25,6 +25,11 @@ type Config struct {
 	Elasticsearch ElasticsearchConf
 	Redis         *redis.RedisConf
 	GetFishTimes  int64
+	RocketMq      *struct {
+		URL       []string
+		Retry     int
+		GroupName string
+	}
 }
 
 func NewConfig() (*Config, error) {
