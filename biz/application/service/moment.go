@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/apache/rocketmq-client-go/v2"
 	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/bytedance/sonic"
 	"github.com/google/wire"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
@@ -12,7 +13,6 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
-	"github.com/zeromicro/go-zero/core/jsonx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/url"
@@ -241,7 +241,7 @@ func (s *MomentService) DeleteMoment(ctx context.Context, req *content.DeleteMom
 }
 
 func (s *MomentService) SendDelayMessage(message interface{}) {
-	json, _ := jsonx.Marshal(message)
+	json, _ := sonic.Marshal(message)
 	msg := &mqprimitive.Message{
 		Topic: "sts_used_url",
 		Body:  json,

@@ -4,8 +4,7 @@ import (
 	"context"
 	"github.com/apache/rocketmq-client-go/v2"
 	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
-	"github.com/zeromicro/go-zero/core/jsonx"
+	"github.com/bytedance/sonic"
 	"net/url"
 
 	imagemapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
@@ -21,7 +20,6 @@ type IImageService interface {
 }
 
 type ImageService struct {
-	Config     *config.Config
 	ImageModel imagemapper.IMongoMapper
 	MqProducer rocketmq.Producer
 }
@@ -49,9 +47,9 @@ func (s *ImageService) CreateImage(ctx context.Context, req *content.CreateImage
 	}
 
 	//发送使用url信息
-	var urls []url.URL
+	var urls = make([]url.URL, len(data))
 	for i := 0; i < len(data); i++ {
-		sendUrl, _ := url.Parse(req.Images[i].Url)
+		sendUrl, _ := url.Parse(data[i].ImageUrl)
 		urls = append(urls, *sendUrl)
 	}
 	go s.SendDelayMessage(urls)
@@ -98,7 +96,7 @@ func (s *ImageService) ListImage(ctx context.Context, req *content.ListImageReq)
 }
 
 func (s *ImageService) SendDelayMessage(message interface{}) {
-	json, _ := jsonx.Marshal(message)
+	json, _ := sonic.Marshal(message)
 	msg := &mqprimitive.Message{
 		Topic: "sts_used_url",
 		Body:  json,

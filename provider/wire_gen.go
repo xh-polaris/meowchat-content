@@ -35,16 +35,17 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		CatEsMapper:    iEsMapper,
 	}
 	imageIMongoMapper := image.NewMongoMapper(configConfig)
-	imageService := &service.ImageService{
-		ImageModel: imageIMongoMapper,
-	}
-	momentIMongoMapper := moment.NewMongoMapper(configConfig)
-	momentIEsMapper := moment.NewEsMapper(configConfig)
-	redisRedis := redis.NewRedis(configConfig)
 	producer, err := mq.NewMqProducer(configConfig)
 	if err != nil {
 		return nil, err
 	}
+	imageService := &service.ImageService{
+		ImageModel: imageIMongoMapper,
+		MqProducer: producer,
+	}
+	momentIMongoMapper := moment.NewMongoMapper(configConfig)
+	momentIEsMapper := moment.NewEsMapper(configConfig)
+	redisRedis := redis.NewRedis(configConfig)
 	momentService := &service.MomentService{
 		Config:            configConfig,
 		MomentMongoMapper: momentIMongoMapper,
