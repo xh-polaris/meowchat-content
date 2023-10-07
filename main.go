@@ -3,6 +3,8 @@ package main
 import (
 	"net"
 
+	"github.com/xh-polaris/gopkg/kitex/client/middleware"
+
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/log"
 	"github.com/xh-polaris/meowchat-content/provider"
 
@@ -26,6 +28,7 @@ func main() {
 		server.WithServiceAddr(addr),
 		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: s.Name}),
+		server.WithMiddleware(middleware.LogMiddleware(s.Name)),
 	)
 
 	err = svr.Run()
