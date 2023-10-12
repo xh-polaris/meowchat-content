@@ -3,9 +3,11 @@ package post
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
-	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 )
 
 type FilterOptions struct {

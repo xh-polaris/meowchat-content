@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
+	"net/url"
+
 	"github.com/apache/rocketmq-client-go/v2"
 	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/bytedance/sonic"
-	"net/url"
 
 	imagemapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 
@@ -52,7 +53,18 @@ func (s *ImageService) CreateImage(ctx context.Context, req *content.CreateImage
 		sendUrl, _ := url.Parse(data[i].ImageUrl)
 		urls = append(urls, *sendUrl)
 	}
-	go s.SendDelayMessage(urls)
+	json, err := sonic.Marshal(urls)
+	if err != nil {
+		return nil, err
+	}
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+	_, err = s.MqProducer.SendSync(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
 
 	return &content.CreateImageResp{ImageIds: id}, nil
 }
@@ -93,22 +105,4 @@ func (s *ImageService) ListImage(ctx context.Context, req *content.ListImageReq)
 		return nil, err
 	}
 	return &content.ListImageResp{Images: imageList, Total: total}, nil
-}
-
-func (s *ImageService) SendDelayMessage(message interface{}) {
-	json, _ := sonic.Marshal(message)
-	msg := &mqprimitive.Message{
-		Topic: "sts_used_url",
-		Body:  json,
-	}
-
-	res, err := s.MqProducer.SendSync(context.Background(), msg)
-	if err != nil || res.Status != mqprimitive.SendOK {
-		for i := 0; i < 2; i++ {
-			res, err := s.MqProducer.SendSync(context.Background(), msg)
-			if err == nil && res.Status == mqprimitive.SendOK {
-				break
-			}
-		}
-	}
 }

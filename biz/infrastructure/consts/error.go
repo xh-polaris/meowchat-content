@@ -2,6 +2,7 @@ package consts
 
 import (
 	"errors"
+
 	"github.com/zeromicro/go-zero/core/stores/mon"
 	"google.golang.org/grpc/status"
 )

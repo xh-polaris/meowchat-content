@@ -3,12 +3,13 @@ package convertor
 import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/xh-polaris/gopkg/pagination"
+	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/basic"
+	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
+
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
-	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/basic"
-	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 )
 
 func ConvertMomentSlice(data []*moment.Moment) []*content.Moment {

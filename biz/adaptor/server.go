@@ -2,6 +2,7 @@ package adaptor
 
 import (
 	"context"
+
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
 
 	"github.com/xh-polaris/meowchat-content/biz/application/service"

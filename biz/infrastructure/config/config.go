@@ -1,11 +1,12 @@
 package config
 
 import (
+	"os"
+
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-	"os"
 )
 
 type ElasticsearchConf struct {
