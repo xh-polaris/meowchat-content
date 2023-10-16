@@ -2,6 +2,11 @@ package service
 
 import (
 	"context"
+	"net/url"
+
+	"github.com/apache/rocketmq-client-go/v2"
+	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/bytedance/sonic"
 
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	catmapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
@@ -24,6 +29,7 @@ type ICatService interface {
 type CatService struct {
 	CatMongoMapper catmapper.IMongoMapper
 	CatEsMapper    catmapper.IEsMapper
+	MqProducer     rocketmq.Producer
 }
 
 var CatSet = wire.NewSet(
@@ -98,6 +104,24 @@ func (s *CatService) CreateCat(ctx context.Context, req *content.CreateCatReq) (
 		return nil, err
 	}
 	err = s.CatMongoMapper.Insert(ctx, cat)
+	if err != nil {
+		return nil, err
+	}
+	//发送使用url信息
+	var urls = make([]url.URL, len(cat.Avatars))
+	for i := 0; i < len(cat.Avatars); i++ {
+		sendUrl, _ := url.Parse(cat.Avatars[i])
+		urls = append(urls, *sendUrl)
+	}
+	json, err := sonic.Marshal(urls)
+	if err != nil {
+		return nil, err
+	}
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+	_, err = s.MqProducer.SendSync(ctx, msg)
 	if err != nil {
 		return nil, err
 	}

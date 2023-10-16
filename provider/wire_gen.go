@@ -30,15 +30,16 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 	}
 	iMongoMapper := cat.NewMongoMapper(configConfig)
 	iEsMapper := cat.NewEsMapper(configConfig)
-	catService := &service.CatService{
-		CatMongoMapper: iMongoMapper,
-		CatEsMapper:    iEsMapper,
-	}
-	imageIMongoMapper := image.NewMongoMapper(configConfig)
 	producer, err := mq.NewMqProducer(configConfig)
 	if err != nil {
 		return nil, err
 	}
+	catService := &service.CatService{
+		CatMongoMapper: iMongoMapper,
+		CatEsMapper:    iEsMapper,
+		MqProducer:     producer,
+	}
+	imageIMongoMapper := image.NewMongoMapper(configConfig)
 	imageService := &service.ImageService{
 		ImageModel: imageIMongoMapper,
 		MqProducer: producer,
@@ -71,6 +72,7 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		PlanEsMapper:      planIEsMapper,
 		DonateMongoMapper: donateIMongoMapper,
 		FishMongoMapper:   fishIMongoMapper,
+		MqProducer:        producer,
 	}
 	contentServerImpl := &adaptor.ContentServerImpl{
 		Config:        configConfig,

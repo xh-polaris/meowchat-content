@@ -2,9 +2,13 @@ package service
 
 import (
 	"context"
+	"net/url"
 	"sort"
 	"time"
 
+	"github.com/apache/rocketmq-client-go/v2"
+	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/bytedance/sonic"
 	"github.com/google/wire"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
@@ -37,6 +41,7 @@ type PlanService struct {
 	PlanEsMapper      plan.IEsMapper
 	DonateMongoMapper donate.IMongoMapper
 	FishMongoMapper   fish.IMongoMapper
+	MqProducer        rocketmq.Producer
 }
 
 var PlanSet = wire.NewSet(
@@ -128,6 +133,25 @@ func (s *PlanService) CreatePlan(ctx context.Context, req *content.CreatePlanReq
 	}
 
 	err := s.PlanMongoMapper.Insert(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	//发送使用url信息
+	var urls = make([]url.URL, len(m.ImageUrls))
+	for i := 0; i < len(m.ImageUrls); i++ {
+		sendUrl, _ := url.Parse(m.ImageUrls[i])
+		urls = append(urls, *sendUrl)
+	}
+	json, err := sonic.Marshal(urls)
+	if err != nil {
+		return nil, err
+	}
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+	_, err = s.MqProducer.SendSync(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
