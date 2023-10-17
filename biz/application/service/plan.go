@@ -180,6 +180,25 @@ func (s *PlanService) UpdatePlan(ctx context.Context, req *content.UpdatePlanReq
 		return nil, err
 	}
 
+	//发送使用url信息
+	var urls = make([]url.URL, len(m.ImageUrls))
+	for i := 0; i < len(m.ImageUrls); i++ {
+		sendUrl, _ := url.Parse(m.ImageUrls[i])
+		urls = append(urls, *sendUrl)
+	}
+	json, err := sonic.Marshal(urls)
+	if err != nil {
+		return nil, err
+	}
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+	_, err = s.MqProducer.SendSync(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &content.UpdatePlanResp{}, nil
 }
 

@@ -142,6 +142,23 @@ func (s *CatService) UpdateCat(ctx context.Context, req *content.UpdateCatReq) (
 	if err != nil {
 		return nil, err
 	}
+	var urls = make([]url.URL, len(cat.Avatars))
+	for i := 0; i < len(cat.Avatars); i++ {
+		sendUrl, _ := url.Parse(cat.Avatars[i])
+		urls = append(urls, *sendUrl)
+	}
+	json, err := sonic.Marshal(urls)
+	if err != nil {
+		return nil, err
+	}
+	msg := &mqprimitive.Message{
+		Topic: "sts_used_url",
+		Body:  json,
+	}
+	_, err = s.MqProducer.SendSync(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
 	return &content.UpdateCatResp{}, nil
 }
 
