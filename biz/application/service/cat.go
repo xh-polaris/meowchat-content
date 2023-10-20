@@ -2,11 +2,8 @@ package service
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/apache/rocketmq-client-go/v2"
-	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/bytedance/sonic"
 
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	catmapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
@@ -108,23 +105,23 @@ func (s *CatService) CreateCat(ctx context.Context, req *content.CreateCatReq) (
 		return nil, err
 	}
 	//发送使用url信息
-	var urls = make([]url.URL, len(cat.Avatars))
-	for i := 0; i < len(cat.Avatars); i++ {
-		sendUrl, _ := url.Parse(cat.Avatars[i])
-		urls = append(urls, *sendUrl)
-	}
-	json, err := sonic.Marshal(urls)
-	if err != nil {
-		return nil, err
-	}
-	msg := &mqprimitive.Message{
-		Topic: "sts_used_url",
-		Body:  json,
-	}
-	_, err = s.MqProducer.SendSync(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
+	//var urls = make([]url.URL, len(cat.Avatars))
+	//for i := 0; i < len(cat.Avatars); i++ {
+	//	sendUrl, _ := url.Parse(cat.Avatars[i])
+	//	urls = append(urls, *sendUrl)
+	//}
+	//json, err := sonic.Marshal(urls)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//msg := &mqprimitive.Message{
+	//	Topic: "sts_used_url",
+	//	Body:  json,
+	//}
+	//_, err = s.MqProducer.SendSync(ctx, msg)
+	//if err != nil {
+	//	return nil, err
+	//}
 	return &content.CreateCatResp{CatId: cat.ID.Hex()}, nil
 }
 
@@ -142,23 +139,23 @@ func (s *CatService) UpdateCat(ctx context.Context, req *content.UpdateCatReq) (
 	if err != nil {
 		return nil, err
 	}
-	var urls = make([]url.URL, len(cat.Avatars))
-	for i := 0; i < len(cat.Avatars); i++ {
-		sendUrl, _ := url.Parse(cat.Avatars[i])
-		urls = append(urls, *sendUrl)
-	}
-	json, err := sonic.Marshal(urls)
-	if err != nil {
-		return nil, err
-	}
-	msg := &mqprimitive.Message{
-		Topic: "sts_used_url",
-		Body:  json,
-	}
-	_, err = s.MqProducer.SendSync(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
+	//var urls = make([]url.URL, len(cat.Avatars))
+	//for i := 0; i < len(cat.Avatars); i++ {
+	//	sendUrl, _ := url.Parse(cat.Avatars[i])
+	//	urls = append(urls, *sendUrl)
+	//}
+	//json, err := sonic.Marshal(urls)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//msg := &mqprimitive.Message{
+	//	Topic: "sts_used_url",
+	//	Body:  json,
+	//}
+	//_, err = s.MqProducer.SendSync(ctx, msg)
+	//if err != nil {
+	//	return nil, err
+	//}
 	return &content.UpdateCatResp{}, nil
 }
 

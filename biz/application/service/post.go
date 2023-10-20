@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -61,10 +60,10 @@ func (s *PostService) CreatePost(ctx context.Context, req *content.CreatePostReq
 	resp.PostId = p.ID.Hex()
 
 	//发送使用url信息
-	var urls []url.URL
-	u, _ := url.Parse(req.CoverUrl)
-	urls = append(urls, *u)
-	go s.SendDelayMessage(urls)
+	//var urls []url.URL
+	//u, _ := url.Parse(req.CoverUrl)
+	//urls = append(urls, *u)
+	//go s.SendDelayMessage(urls)
 
 	//小鱼干奖励
 	data, err := s.Redis.GetCtx(ctx, "contentTimes"+req.UserId)
@@ -157,10 +156,10 @@ func (s *PostService) UpdatePost(ctx context.Context, req *content.UpdatePostReq
 	}
 
 	//发送使用url信息
-	var urls []url.URL
-	u, _ := url.Parse(req.CoverUrl)
-	urls = append(urls, *u)
-	go s.SendDelayMessage(urls)
+	//var urls []url.URL
+	//u, _ := url.Parse(req.CoverUrl)
+	//urls = append(urls, *u)
+	//go s.SendDelayMessage(urls)
 
 	return &content.UpdatePostResp{}, nil
 }

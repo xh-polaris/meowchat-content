@@ -2,11 +2,8 @@ package service
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/apache/rocketmq-client-go/v2"
-	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/bytedance/sonic"
 
 	imagemapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 
@@ -48,23 +45,23 @@ func (s *ImageService) CreateImage(ctx context.Context, req *content.CreateImage
 	}
 
 	//发送使用url信息
-	var urls = make([]url.URL, len(data))
-	for i := 0; i < len(data); i++ {
-		sendUrl, _ := url.Parse(data[i].ImageUrl)
-		urls = append(urls, *sendUrl)
-	}
-	json, err := sonic.Marshal(urls)
-	if err != nil {
-		return nil, err
-	}
-	msg := &mqprimitive.Message{
-		Topic: "sts_used_url",
-		Body:  json,
-	}
-	_, err = s.MqProducer.SendSync(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
+	//var urls = make([]url.URL, len(data))
+	//for i := 0; i < len(data); i++ {
+	//	sendUrl, _ := url.Parse(data[i].ImageUrl)
+	//	urls = append(urls, *sendUrl)
+	//}
+	//json, err := sonic.Marshal(urls)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//msg := &mqprimitive.Message{
+	//	Topic: "sts_used_url",
+	//	Body:  json,
+	//}
+	//_, err = s.MqProducer.SendSync(ctx, msg)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return &content.CreateImageResp{ImageIds: id}, nil
 }
