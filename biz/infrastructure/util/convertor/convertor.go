@@ -23,7 +23,7 @@ func ConvertMomentSlice(data []*moment.Moment) []*content.Moment {
 			Text:        d.Text,
 			UserId:      d.UserId,
 			CommunityId: d.CommunityId,
-			CatId:       d.CatId,
+			CatId:       &d.CatId,
 		}
 		res[i] = m
 	}
@@ -39,22 +39,28 @@ func ConvertMoment(data *moment.Moment) *content.Moment {
 		Text:        data.Text,
 		UserId:      data.UserId,
 		CommunityId: data.CommunityId,
-		CatId:       data.CatId,
+		CatId:       &data.CatId,
 	}
 }
 
 func ConvertPlan(data *plan.Plan) *content.Plan {
 	return &content.Plan{
-		Id:           data.ID.Hex(),
-		CreateAt:     data.CreateAt.Unix(),
-		PlanType:     data.PlanType,
-		EndTime:      data.EndTime.Unix(),
-		Description:  data.Description,
-		StartTime:    data.StartTime.Unix(),
-		InitiatorIds: data.InitiatorIds,
-		CatId:        data.CatId,
-		ImageUrls:    data.ImageUrls,
-		Name:         data.Name,
+		Id:          data.ID.Hex(),
+		CreateAt:    data.CreateAt.Unix(),
+		PlanType:    data.PlanType,
+		EndTime:     data.EndTime.Unix(),
+		Description: data.Description,
+		StartTime:   data.StartTime.Unix(),
+		InitiatorId: data.InitiatorId,
+		CatId:       data.CatId,
+		ImageUrls:   data.ImageUrls,
+		Name:        data.Name,
+		Instruction: data.Instruction,
+		CoverUrl:    data.CoverUrl,
+		Summary:     data.Summary,
+		MaxFish:     data.MaxFish,
+		NowFish:     data.NowFish,
+		PlanState:   data.PlanState,
 	}
 }
 

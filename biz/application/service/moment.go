@@ -122,7 +122,7 @@ func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMom
 		Text:        m.Text,
 		CommunityId: m.CommunityId,
 		UserId:      m.UserId,
-		CatId:       m.CatId,
+		CatId:       m.GetCatId(),
 	}
 
 	err := s.MomentMongoMapper.Insert(ctx, data)
@@ -211,7 +211,7 @@ func (s *MomentService) UpdateMoment(ctx context.Context, req *content.UpdateMom
 
 	err = s.MomentMongoMapper.Update(ctx, &moment.Moment{
 		ID:          momentId,
-		CatId:       m.CatId,
+		CatId:       m.GetCatId(),
 		CommunityId: m.CommunityId,
 		Photos:      m.Photos,
 		Title:       m.Title,

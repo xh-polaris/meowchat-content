@@ -32,7 +32,7 @@ func (f *MongoFilter) toBson() bson.M {
 
 func (f *MongoFilter) CheckOnlyUserId() {
 	if f.OnlyUserId != nil {
-		f.m[consts.InitiatorIds] = *f.OnlyUserId
+		f.m[consts.InitiatorId] = *f.OnlyUserId
 	}
 }
 
@@ -64,7 +64,7 @@ func (f *EsFilter) checkOnlyUserId() {
 	if f.OnlyUserId != nil {
 		f.q = append(f.q, types.Query{
 			Term: map[string]types.TermQuery{
-				consts.InitiatorIds: {Value: *f.OnlyUserId},
+				consts.InitiatorId: {Value: *f.OnlyUserId},
 			},
 		})
 	}

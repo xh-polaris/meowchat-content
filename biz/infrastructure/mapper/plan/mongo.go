@@ -37,17 +37,21 @@ type (
 	}
 
 	Plan struct {
-		ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-		Name         string             `bson:"name,omitempty"`
-		CatId        string             `bson:"catId,omitempty"`
-		ImageUrls    []string           `bson:"imageUrls,omitempty"`
-		Description  string             `bson:"description,omitempty"`
-		PlanType     content.PlanType   `bson:"planType,omitempty" json:"planType,omitempty"`
-		InitiatorIds []string           `bson:"initiatorIds,omitempty"`
-		StartTime    time.Time          `bson:"startTime,omitempty" json:"startTime,omitempty"`
-		EndTime      time.Time          `bson:"endTime,omitempty" json:"endTime,omitempty"`
-		MaxFish      int64              `bson:"maxFish,omitempty" json:"maxFish,omitempty"`
-		NowFish      int64              `bson:"nowFish,omitempty" json:"nowFish,omitempty"`
+		ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+		Name        string             `bson:"name,omitempty"`
+		CatId       string             `bson:"catId,omitempty"`
+		CoverUrl    string             `bson:"coverUrl,omitempty"`
+		ImageUrls   []string           `bson:"imageUrls,omitempty"`
+		Description string             `bson:"description,omitempty"`
+		PlanType    content.PlanType   `bson:"planType,omitempty" json:"planType,omitempty"`
+		InitiatorId string             `bson:"initiatorId,omitempty"`
+		StartTime   time.Time          `bson:"startTime,omitempty" json:"startTime,omitempty"`
+		EndTime     time.Time          `bson:"endTime,omitempty" json:"endTime,omitempty"`
+		MaxFish     int64              `bson:"maxFish,omitempty" json:"maxFish,omitempty"`
+		NowFish     int64              `bson:"nowFish,omitempty" json:"nowFish,omitempty"`
+		Instruction string             `bson:"instruction,omitempty"`
+		Summary     string             `bson:"summary,omitempty"`
+		PlanState   content.PlanState  `bson:"planState,omitempty" json:"planState,omitempty"`
 
 		UpdateAt time.Time `bson:"updateAt,omitempty" json:"updateAt,omitempty"`
 		CreateAt time.Time `bson:"createAt,omitempty" json:"createAt,omitempty"`

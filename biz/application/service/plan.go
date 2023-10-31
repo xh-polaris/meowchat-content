@@ -119,14 +119,19 @@ func (s *PlanService) RetrievePlan(ctx context.Context, req *content.RetrievePla
 func (s *PlanService) CreatePlan(ctx context.Context, req *content.CreatePlanReq) (*content.CreatePlanResp, error) {
 	m := req.Plan
 	data := &plan.Plan{
-		CatId:        m.CatId,
-		PlanType:     m.PlanType,
-		StartTime:    time.Unix(m.StartTime, 0),
-		EndTime:      time.Unix(m.EndTime, 0),
-		Description:  m.Description,
-		ImageUrls:    m.ImageUrls,
-		Name:         m.Name,
-		InitiatorIds: m.InitiatorIds,
+		CatId:       m.CatId,
+		PlanType:    m.PlanType,
+		StartTime:   time.Unix(m.StartTime, 0),
+		EndTime:     time.Unix(m.EndTime, 0),
+		Description: m.Description,
+		ImageUrls:   m.ImageUrls,
+		Name:        m.Name,
+		InitiatorId: m.InitiatorId,
+		CoverUrl:    m.CoverUrl,
+		Instruction: m.Instruction,
+		Summary:     m.Summary,
+		PlanState:   m.PlanState,
+		MaxFish:     m.MaxFish,
 	}
 
 	err := s.PlanMongoMapper.Insert(ctx, data)
@@ -164,14 +169,20 @@ func (s *PlanService) UpdatePlan(ctx context.Context, req *content.UpdatePlanReq
 	}
 
 	err = s.PlanMongoMapper.Update(ctx, &plan.Plan{
-		ID:           PlanId,
-		CatId:        m.CatId,
-		PlanType:     m.PlanType,
-		StartTime:    time.Unix(m.StartTime, 0),
-		EndTime:      time.Unix(m.EndTime, 0),
-		Description:  m.Description,
-		ImageUrls:    m.ImageUrls,
-		InitiatorIds: m.InitiatorIds,
+		ID:          PlanId,
+		CatId:       m.CatId,
+		PlanType:    m.PlanType,
+		StartTime:   time.Unix(m.StartTime, 0),
+		EndTime:     time.Unix(m.EndTime, 0),
+		Description: m.Description,
+		ImageUrls:   m.ImageUrls,
+		InitiatorId: m.InitiatorId,
+		CoverUrl:    m.CoverUrl,
+		Instruction: m.Instruction,
+		Summary:     m.Summary,
+		PlanState:   m.PlanState,
+		NowFish:     m.NowFish,
+		MaxFish:     m.MaxFish,
 	})
 	if err != nil {
 		return nil, err

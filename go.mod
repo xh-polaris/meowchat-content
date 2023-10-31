@@ -13,7 +13,7 @@ require (
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/xh-polaris/gopkg v0.0.0-20230915071845-b0ecd425cb58
-	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230819155341-4a3ac3fe3b89
+	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231030160700-9f0bb8f39e9b
 	github.com/zeromicro/go-zero v1.5.4
 	go.mongodb.org/mongo-driver v1.12.0
 	google.golang.org/grpc v1.56.2
