@@ -22,4 +22,5 @@ const (
 	InitiatorId = "initiatorId"
 	PlanId      = "planId"
 	FishNum     = "fishNum"
+	NowFish     = "nowFish"
 )
