@@ -16,7 +16,7 @@ require (
 	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231101061413-e1759adaa141
 	github.com/zeromicro/go-zero v1.5.4
 	go.mongodb.org/mongo-driver v1.12.0
-	google.golang.org/grpc v1.56.2
+	google.golang.org/grpc v1.57.0
 )
 
 require (
