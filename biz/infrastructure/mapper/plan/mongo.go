@@ -191,8 +191,12 @@ func (m *MongoMapper) Delete(ctx context.Context, id string) error {
 
 func (m *MongoMapper) Add(ctx context.Context, id string, add int64) error {
 	key := prefixPlanCacheKey + id
-	filter := bson.M{consts.ID: id}
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return consts.ErrInvalidObjectId
+	}
+	filter := bson.M{consts.ID: oid}
 	update := bson.M{"$inc": bson.M{consts.NowFish: add}, "$set": bson.M{consts.UpdateAt: time.Now()}}
-	_, err := m.conn.UpdateOne(ctx, key, filter, update)
+	_, err = m.conn.UpdateOne(ctx, key, filter, update)
 	return err
 }

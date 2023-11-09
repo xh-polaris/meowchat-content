@@ -264,7 +264,9 @@ func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq
 		}
 		return nil
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	return &content.DonateFishResp{}, nil
 }
 
