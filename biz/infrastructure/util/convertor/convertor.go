@@ -53,6 +53,7 @@ func ConvertPlan(data *plan.Plan) *content.Plan {
 		StartTime:   data.StartTime.Unix(),
 		InitiatorId: data.InitiatorId,
 		CatId:       data.CatId,
+		CommunityId: data.CommunityId,
 		ImageUrls:   data.ImageUrls,
 		Name:        data.Name,
 		Instruction: data.Instruction,
@@ -201,8 +202,10 @@ func ParsePlanFilter(opts *content.PlanFilterOptions) (filter *plan.FilterOption
 		filter = &plan.FilterOptions{}
 	} else {
 		filter = &plan.FilterOptions{
-			OnlyUserId: opts.OnlyUserId,
-			OnlyCatId:  opts.OnlyCatId,
+			OnlyUserId:      opts.OnlyUserId,
+			OnlyCommunityId: opts.OnlyCommunityId,
+			OnlyCatId:       opts.OnlyCatId,
+			IncludeGlobal:   opts.IncludeGlobal,
 		}
 	}
 	return

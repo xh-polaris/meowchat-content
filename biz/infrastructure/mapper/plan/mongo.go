@@ -40,6 +40,7 @@ type (
 		ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 		Name        string             `bson:"name,omitempty"`
 		CatId       string             `bson:"catId,omitempty"`
+		CommunityId string             `bson:"communityId,omitempty"`
 		CoverUrl    string             `bson:"coverUrl,omitempty"`
 		ImageUrls   []string           `bson:"imageUrls,omitempty"`
 		Description string             `bson:"description,omitempty"`

@@ -120,7 +120,7 @@ func (m *MongoMapper) ListDonateByUser(ctx context.Context, userId string) ([]*D
 	var err error
 
 	opts := options.FindOptions{
-		Sort: bson.M{consts.FishNum: -1},
+		Sort: bson.M{consts.CreateAt: -1},
 	}
 	filter := bson.M{consts.UserId: userId}
 

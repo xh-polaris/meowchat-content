@@ -120,6 +120,7 @@ func (s *PlanService) CreatePlan(ctx context.Context, req *content.CreatePlanReq
 	m := req.Plan
 	data := &plan.Plan{
 		CatId:       m.CatId,
+		CommunityId: m.CommunityId,
 		PlanType:    m.PlanType,
 		StartTime:   time.Unix(m.StartTime, 0),
 		EndTime:     time.Unix(m.EndTime, 0),
@@ -171,6 +172,7 @@ func (s *PlanService) UpdatePlan(ctx context.Context, req *content.UpdatePlanReq
 	err = s.PlanMongoMapper.Update(ctx, &plan.Plan{
 		ID:          PlanId,
 		CatId:       m.CatId,
+		CommunityId: m.CommunityId,
 		PlanType:    m.PlanType,
 		StartTime:   time.Unix(m.StartTime, 0),
 		EndTime:     time.Unix(m.EndTime, 0),
