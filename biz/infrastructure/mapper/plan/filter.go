@@ -57,6 +57,8 @@ func (f *MongoFilter) CheckOnlyCommunityId() {
 	} else {
 		if f.OnlyCommunityId != nil {
 			f.m["$or"] = bson.A{bson.M{consts.CommunityId: bson.M{"$exists": false}}, bson.M{consts.CommunityId: *f.OnlyCommunityId}}
+		} else {
+			f.m[consts.CommunityId] = bson.M{"$exists": false}
 		}
 	}
 
@@ -135,6 +137,24 @@ func (f *EsFilter) checkOnlyCommunityId() {
 			BoolQuery = append(BoolQuery, types.Query{
 				Term: map[string]types.TermQuery{
 					consts.CommunityId: {Value: *f.OnlyCommunityId},
+				},
+			})
+			f.q = append(f.q, types.Query{
+				Bool: &types.BoolQuery{
+					Should: BoolQuery,
+				},
+			})
+		} else {
+			BoolQuery := make([]types.Query, 0)
+			BoolQuery = append(BoolQuery, types.Query{
+				Bool: &types.BoolQuery{
+					MustNot: []types.Query{
+						types.Query{
+							Exists: &types.ExistsQuery{
+								Field: consts.CommunityId,
+							},
+						},
+					},
 				},
 			})
 			f.q = append(f.q, types.Query{
