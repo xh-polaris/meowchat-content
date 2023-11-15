@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"sort"
 	"time"
 
 	"github.com/apache/rocketmq-client-go/v2"
@@ -10,6 +9,7 @@ import (
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
+	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -30,7 +30,10 @@ type IPlanService interface {
 	DonateFish(ctx context.Context, req *content.DonateFishReq) (*content.DonateFishResp, error)
 	AddUserFish(ctx context.Context, req *content.AddUserFishReq) (*content.AddUserFishResp, error)
 	ListFishByPlan(ctx context.Context, req *content.ListFishByPlanReq) (*content.ListFishByPlanResp, error)
+	ListDonateByUser(ctx context.Context, req *content.ListDonateByUserReq) (*content.ListDonateByUserResp, error)
 	RetrieveUserFish(ctx context.Context, req *content.RetrieveUserFishReq) (*content.RetrieveUserFishResp, error)
+	CountDonateByPlan(ctx context.Context, req *content.CountDonateByPlanReq) (*content.CountDonateByPlanResp, error)
+	CountDonateByUser(ctx context.Context, req *content.CountDonateByUserReq) (*content.CountDonateByUserResp, error)
 }
 
 type PlanService struct {
@@ -235,13 +238,32 @@ func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq
 		if err != nil {
 			return err
 		}
-
-		err = s.DonateMongoMapper.Insert(sessionContext, &donate.Donate{
-			UserId:  req.UserId,
-			PlanId:  req.PlanId,
-			FishNum: req.Fish,
-		})
-		if err != nil {
+		data, err := s.DonateMongoMapper.FindOneById(sessionContext, req.PlanId, req.UserId)
+		switch err {
+		case nil:
+			data.FishNum += req.Fish
+			err := s.DonateMongoMapper.Update(sessionContext, data)
+			if err != nil {
+				err = sessionContext.AbortTransaction(sessionContext)
+				if err != nil {
+					return err
+				}
+				return err
+			}
+		case monc.ErrNotFound:
+			err = s.DonateMongoMapper.Insert(sessionContext, &donate.Donate{
+				UserId:  req.UserId,
+				PlanId:  req.PlanId,
+				FishNum: req.Fish,
+			})
+			if err != nil {
+				err = sessionContext.AbortTransaction(sessionContext)
+				if err != nil {
+					return err
+				}
+				return err
+			}
+		default:
 			err = sessionContext.AbortTransaction(sessionContext)
 			if err != nil {
 				return err
@@ -301,28 +323,52 @@ func (s *PlanService) AddUserFish(ctx context.Context, req *content.AddUserFishR
 }
 
 func (s *PlanService) ListFishByPlan(ctx context.Context, req *content.ListFishByPlanReq) (*content.ListFishByPlanResp, error) {
-	data, err := s.DonateMongoMapper.ListDonateByPlan(ctx, req.PlanId)
+	resp := new(content.ListFishByPlanResp)
+
+	p := convertor.ParsePagination(req.PaginationOptions)
+	data, total, err := s.DonateMongoMapper.FindManyAndCountByPlanId(ctx, req.PlanId, p)
 	if err != nil {
 		return nil, err
 	}
 	fishMap := make(map[string]int64, len(data))
 	userIds := make([]string, 0, len(data))
 	for _, value := range data {
-		i, ok := fishMap[value.UserId]
-		if ok == true {
-			fishMap[value.UserId] = value.FishNum + i
-		} else {
-			fishMap[value.UserId] = value.FishNum
-			userIds = append(userIds, value.UserId)
-		}
+		fishMap[value.UserId] = value.FishNum
+		userIds = append(userIds, value.UserId)
 	}
-	sort.Slice(userIds, func(i, j int) bool {
-		return fishMap[userIds[i]] > fishMap[userIds[j]]
-	})
-	return &content.ListFishByPlanResp{
-		UserIds: userIds,
-		FishMap: fishMap,
-	}, nil
+	resp.Total = total
+	resp.FishMap = fishMap
+	resp.UserIds = userIds
+	return resp, nil
+}
+
+func (s *PlanService) ListDonateByUser(ctx context.Context, req *content.ListDonateByUserReq) (*content.ListDonateByUserResp, error) {
+	resp := new(content.ListDonateByUserResp)
+
+	p := convertor.ParsePagination(req.PaginationOptions)
+	data, total, err := s.DonateMongoMapper.FindManyAndCountByUserId(ctx, req.UserId, p, mongop.IdCursorType)
+	if err != nil {
+		return nil, err
+	}
+
+	resp.Total = total
+	if p.LastToken != nil {
+		resp.Token = *p.LastToken
+	}
+	resp.PlanPreviews = make([]*content.PlanPreview, 0)
+	for _, v := range data {
+		temp := &content.PlanPreview{}
+		temp.Id = v.ID.Hex()
+		temp.DonateNum = v.FishNum
+		temp.DonateTime = v.CreateAt.Unix()
+		plan_, err := s.PlanMongoMapper.FindOne(ctx, v.PlanId)
+		if err == nil {
+			temp.CatId = plan_.CatId
+			temp.Name = plan_.Name
+		}
+		resp.PlanPreviews = append(resp.PlanPreviews, temp)
+	}
+	return resp, nil
 }
 
 func (s *PlanService) RetrieveUserFish(ctx context.Context, req *content.RetrieveUserFishReq) (*content.RetrieveUserFishResp, error) {
@@ -335,4 +381,24 @@ func (s *PlanService) RetrieveUserFish(ctx context.Context, req *content.Retriev
 	default:
 		return nil, err
 	}
+}
+
+func (s *PlanService) CountDonateByPlan(ctx context.Context, req *content.CountDonateByPlanReq) (*content.CountDonateByPlanResp, error) {
+	total, err := s.DonateMongoMapper.CountByPlanId(ctx, req.PlanId)
+	if err != nil {
+		return nil, err
+	}
+	return &content.CountDonateByPlanResp{
+		Total: total,
+	}, nil
+}
+
+func (s *PlanService) CountDonateByUser(ctx context.Context, req *content.CountDonateByUserReq) (*content.CountDonateByUserResp, error) {
+	total, err := s.DonateMongoMapper.CountByUserId(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &content.CountDonateByUserResp{
+		Total: total,
+	}, nil
 }

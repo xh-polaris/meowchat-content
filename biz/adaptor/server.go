@@ -18,44 +18,48 @@ type ContentServerImpl struct {
 	PlanService   service.IPlanService
 }
 
+func (s *ContentServerImpl) CountDonateByPlan(ctx context.Context, req *content.CountDonateByPlanReq) (res *content.CountDonateByPlanResp, err error) {
+	return s.PlanService.CountDonateByPlan(ctx, req)
+}
+
+func (s *ContentServerImpl) CountDonateByUser(ctx context.Context, req *content.CountDonateByUserReq) (res *content.CountDonateByUserResp, err error) {
+	return s.PlanService.CountDonateByUser(ctx, req)
+}
+
 func (s *ContentServerImpl) DonateFish(ctx context.Context, req *content.DonateFishReq) (res *content.DonateFishResp, err error) {
 	return s.PlanService.DonateFish(ctx, req)
-
 }
 
 func (s *ContentServerImpl) AddUserFish(ctx context.Context, req *content.AddUserFishReq) (res *content.AddUserFishResp, err error) {
 	return s.PlanService.AddUserFish(ctx, req)
-
 }
 
 func (s *ContentServerImpl) ListFishByPlan(ctx context.Context, req *content.ListFishByPlanReq) (res *content.ListFishByPlanResp, err error) {
 	return s.PlanService.ListFishByPlan(ctx, req)
+}
 
+func (s *ContentServerImpl) ListDonateByUser(ctx context.Context, req *content.ListDonateByUserReq) (res *content.ListDonateByUserResp, err error) {
+	return s.PlanService.ListDonateByUser(ctx, req)
 }
 
 func (s *ContentServerImpl) RetrieveUserFish(ctx context.Context, req *content.RetrieveUserFishReq) (res *content.RetrieveUserFishResp, err error) {
 	return s.PlanService.RetrieveUserFish(ctx, req)
-
 }
 
 func (s *ContentServerImpl) ListPlan(ctx context.Context, req *content.ListPlanReq) (res *content.ListPlanResp, err error) {
 	return s.PlanService.ListPlan(ctx, req)
-
 }
 
 func (s *ContentServerImpl) CountPlan(ctx context.Context, req *content.CountPlanReq) (res *content.CountPlanResp, err error) {
 	return s.PlanService.CountPlan(ctx, req)
-
 }
 
 func (s *ContentServerImpl) RetrievePlan(ctx context.Context, req *content.RetrievePlanReq) (res *content.RetrievePlanResp, err error) {
 	return s.PlanService.RetrievePlan(ctx, req)
-
 }
 
 func (s *ContentServerImpl) CreatePlan(ctx context.Context, req *content.CreatePlanReq) (res *content.CreatePlanResp, err error) {
 	return s.PlanService.CreatePlan(ctx, req)
-
 }
 
 func (s *ContentServerImpl) UpdatePlan(ctx context.Context, req *content.UpdatePlanReq) (res *content.UpdatePlanResp, err error) {
