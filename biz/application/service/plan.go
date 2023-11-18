@@ -136,6 +136,7 @@ func (s *PlanService) CreatePlan(ctx context.Context, req *content.CreatePlanReq
 		Summary:     m.Summary,
 		PlanState:   m.PlanState,
 		MaxFish:     m.MaxFish,
+		NowFish:     0,
 	}
 
 	err := s.PlanMongoMapper.Insert(ctx, data)
@@ -244,9 +245,9 @@ func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq
 			data.FishNum += req.Fish
 			err := s.DonateMongoMapper.Update(sessionContext, data)
 			if err != nil {
-				err = sessionContext.AbortTransaction(sessionContext)
-				if err != nil {
-					return err
+				err2 := sessionContext.AbortTransaction(sessionContext)
+				if err2 != nil {
+					return err2
 				}
 				return err
 			}
@@ -257,32 +258,53 @@ func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq
 				FishNum: req.Fish,
 			})
 			if err != nil {
-				err = sessionContext.AbortTransaction(sessionContext)
-				if err != nil {
-					return err
+				err2 := sessionContext.AbortTransaction(sessionContext)
+				if err2 != nil {
+					return err2
 				}
 				return err
 			}
 		default:
-			err = sessionContext.AbortTransaction(sessionContext)
-			if err != nil {
-				return err
+			err2 := sessionContext.AbortTransaction(sessionContext)
+			if err2 != nil {
+				return err2
 			}
 			return err
 		}
-		err = s.PlanMongoMapper.Add(sessionContext, req.PlanId, req.Fish)
-		if err != nil {
-			err = sessionContext.AbortTransaction(sessionContext)
+		p, err := s.PlanMongoMapper.FindOne(ctx, req.PlanId)
+		if p.NowFish+req.Fish > p.MaxFish {
+			err2 := sessionContext.AbortTransaction(sessionContext)
+			if err2 != nil {
+				return err2
+			}
+			return consts.ErrDonateOverFlow
+		} else if p.NowFish+req.Fish == p.MaxFish {
+			p.PlanState = 2
+			p.NowFish = p.MaxFish
+			err := s.PlanMongoMapper.Update(ctx, p)
 			if err != nil {
+				err2 := sessionContext.AbortTransaction(sessionContext)
+				if err2 != nil {
+					return err2
+				}
 				return err
 			}
-			return err
+		} else {
+			p.NowFish += req.Fish
+			err := s.PlanMongoMapper.Update(ctx, p)
+			if err != nil {
+				err2 := sessionContext.AbortTransaction(sessionContext)
+				if err2 != nil {
+					return err2
+				}
+				return err
+			}
 		}
 		err = sessionContext.CommitTransaction(sessionContext)
 		if err != nil {
-			err = sessionContext.AbortTransaction(sessionContext)
-			if err != nil {
-				return err
+			err2 := sessionContext.AbortTransaction(sessionContext)
+			if err2 != nil {
+				return err2
 			}
 			return err
 		}
