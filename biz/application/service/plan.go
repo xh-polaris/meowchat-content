@@ -387,6 +387,7 @@ func (s *PlanService) ListDonateByUser(ctx context.Context, req *content.ListDon
 		if err == nil {
 			temp.CatId = plan_.CatId
 			temp.Name = plan_.Name
+			temp.CoverUrl = plan_.CoverUrl
 		}
 		resp.PlanPreviews = append(resp.PlanPreviews, temp)
 	}
