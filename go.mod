@@ -7,7 +7,7 @@ require (
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317
 	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/hertz v0.6.6
-	github.com/cloudwego/kitex v0.6.1
+	github.com/cloudwego/kitex v0.6.2
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
 	github.com/google/wire v0.5.0
 	github.com/jinzhu/copier v0.3.5
