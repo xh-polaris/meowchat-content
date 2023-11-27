@@ -9,6 +9,7 @@ import (
 	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/bytedance/sonic"
 	"github.com/google/wire"
+	"github.com/samber/lo"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/content"
@@ -17,7 +18,9 @@ import (
 
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
+	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/util/convertor"
 )
 
@@ -34,6 +37,7 @@ type MomentService struct {
 	Config            *config.Config
 	MomentMongoMapper moment.IMongoMapper
 	MomentEsMapper    moment.IEsMapper
+	ImageMapper       image.IMongoMapper
 	Redis             *redis.Redis
 	MqProducer        rocketmq.Producer
 }
@@ -128,6 +132,16 @@ func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMom
 	err := s.MomentMongoMapper.Insert(ctx, data)
 	if err != nil {
 		return nil, err
+	}
+	if m.GetCatId() != "" {
+		util.ParallelRun(lo.Map(m.Photos, func(photo string, i int) func() {
+			return func() {
+				_ = s.ImageMapper.Insert(ctx, &image.Image{
+					CatId:    m.GetCatId(),
+					ImageUrl: photo,
+				})
+			}
+		}))
 	}
 
 	resp.MomentId = data.ID.Hex()

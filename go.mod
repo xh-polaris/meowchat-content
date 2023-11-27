@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
+	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317
 	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/hertz v0.6.6
 	github.com/cloudwego/kitex v0.6.1
@@ -12,6 +13,7 @@ require (
 	github.com/jinzhu/copier v0.3.5
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/samber/lo v1.38.1
 	github.com/xh-polaris/gopkg v0.0.0-20231013165226-76f4d7108b9d
 	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231126125904-a5482cc2302d
 	github.com/zeromicro/go-zero v1.6.0
@@ -23,7 +25,6 @@ require (
 	github.com/apache/thrift v0.13.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.6.0 // indirect
-	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
@@ -92,6 +93,7 @@ require (
 	go.uber.org/automaxprocs v1.5.3 // indirect
 	golang.org/x/arch v0.2.0 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect

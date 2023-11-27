@@ -51,6 +51,7 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		Config:            configConfig,
 		MomentMongoMapper: momentIMongoMapper,
 		MomentEsMapper:    momentIEsMapper,
+		ImageMapper:       imageIMongoMapper,
 		Redis:             redisRedis,
 		MqProducer:        producer,
 	}
