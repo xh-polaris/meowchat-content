@@ -15,7 +15,7 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/samber/lo v1.38.1
 	github.com/xh-polaris/gopkg v0.0.0-20231013165226-76f4d7108b9d
-	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231126125904-a5482cc2302d
+	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231202185651-ef33c5b2abe5
 	github.com/zeromicro/go-zero v1.6.0
 	go.mongodb.org/mongo-driver v1.12.1
 	google.golang.org/grpc v1.59.0

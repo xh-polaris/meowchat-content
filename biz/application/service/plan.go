@@ -376,19 +376,17 @@ func (s *PlanService) ListDonateByUser(ctx context.Context, req *content.ListDon
 	if p.LastToken != nil {
 		resp.Token = *p.LastToken
 	}
-	resp.PlanPreviews = make([]*content.PlanPreview, 0)
+	resp.Plans = make([]*content.Plan, 0)
 	for _, v := range data {
-		temp := &content.PlanPreview{}
-		temp.Id = v.ID.Hex()
-		temp.DonateNum = v.FishNum
-		temp.DonateTime = v.CreateAt.Unix()
+		temp := &content.Plan{}
+		temp.Id = v.PlanId
 		plan_, err := s.PlanMongoMapper.FindOne(ctx, v.PlanId)
 		if err == nil {
-			temp.CatId = plan_.CatId
-			temp.Name = plan_.Name
-			temp.CoverUrl = plan_.CoverUrl
+			temp = convertor.ConvertPlan(plan_)
 		}
-		resp.PlanPreviews = append(resp.PlanPreviews, temp)
+		temp.DonateNum = v.FishNum
+		temp.DonateTime = v.CreateAt.Unix()
+		resp.Plans = append(resp.Plans, temp)
 	}
 	return resp, nil
 }
