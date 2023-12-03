@@ -376,7 +376,7 @@ func (s *PlanService) ListDonateByUser(ctx context.Context, req *content.ListDon
 	if p.LastToken != nil {
 		resp.Token = *p.LastToken
 	}
-	resp.Plans = make([]*content.Plan, 0)
+	resp.Donations = make([]*content.Donation, 0)
 	for _, v := range data {
 		temp := &content.Plan{}
 		temp.Id = v.PlanId
@@ -384,9 +384,11 @@ func (s *PlanService) ListDonateByUser(ctx context.Context, req *content.ListDon
 		if err == nil {
 			temp = convertor.ConvertPlan(plan_)
 		}
-		temp.DonateNum = v.FishNum
-		temp.DonateTime = v.CreateAt.Unix()
-		resp.Plans = append(resp.Plans, temp)
+		resp.Donations = append(resp.Donations, &content.Donation{
+			Plan:       temp,
+			DonateTime: v.CreateAt.Unix(),
+			DonateNum:  v.FishNum,
+		})
 	}
 	return resp, nil
 }
