@@ -388,6 +388,7 @@ func (s *PlanService) ListDonateByUser(ctx context.Context, req *content.ListDon
 			Plan:       temp,
 			DonateTime: v.CreateAt.Unix(),
 			DonateNum:  v.FishNum,
+			DonateId:   v.ID.Hex(),
 		})
 	}
 	return resp, nil
