@@ -225,7 +225,7 @@ func (s *PlanService) DeletePlan(ctx context.Context, req *content.DeletePlanReq
 
 func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq) (*content.DonateFishResp, error) {
 	if req.GetFish() <= 0 {
-		return nil, consts.ErrDonate
+		return nil, consts.ErrDonateInvalid
 	}
 
 	dbClient, err := s.FishMongoMapper.StartClient(ctx)
@@ -237,6 +237,13 @@ func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq
 		err = sessionContext.StartTransaction()
 		if err != nil {
 			return err
+		}
+		r, err := s.RetrieveUserFish(ctx, &content.RetrieveUserFishReq{UserId: req.UserId})
+		if err != nil {
+			return err
+		}
+		if req.GetFish() > r.Fish {
+			return consts.ErrFishNotEnough
 		}
 		err = s.FishMongoMapper.Add(sessionContext, req.UserId, -req.Fish)
 		if err != nil {

@@ -13,7 +13,8 @@ var (
 	ErrNoSuchPost            = status.Error(10301, "no such post")
 	ErrPaginatorTokenExpired = status.Error(10303, "paginator token has been expired")
 	ErrDonateOverFlow        = status.Error(10201, "donate too many fish")
-	ErrDonate                = status.Error(10201, "donate less than 0")
+	ErrDonateInvalid         = status.Error(10202, "donate less than 0")
+	ErrFishNotEnough         = status.Error(10203, "fish not enough")
 )
 
 var (
