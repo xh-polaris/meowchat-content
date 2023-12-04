@@ -224,6 +224,10 @@ func (s *PlanService) DeletePlan(ctx context.Context, req *content.DeletePlanReq
 }
 
 func (s *PlanService) DonateFish(ctx context.Context, req *content.DonateFishReq) (*content.DonateFishResp, error) {
+	if req.GetFish() <= 0 {
+		return nil, consts.ErrDonate
+	}
+
 	dbClient, err := s.FishMongoMapper.StartClient(ctx)
 	if err != nil {
 		return nil, err
