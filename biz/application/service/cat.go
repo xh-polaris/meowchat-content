@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/apache/rocketmq-client-go/v2"
-
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
 	catmapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
 
@@ -26,7 +24,6 @@ type ICatService interface {
 type CatService struct {
 	CatMongoMapper catmapper.IMongoMapper
 	CatEsMapper    catmapper.IEsMapper
-	MqProducer     rocketmq.Producer
 }
 
 var CatSet = wire.NewSet(
@@ -36,9 +33,6 @@ var CatSet = wire.NewSet(
 
 func (s *CatService) SearchCat(ctx context.Context, req *content.SearchCatReq) (res *content.SearchCatResp, err error) {
 	data, total, err := s.CatEsMapper.Search(ctx, req.CommunityId, req.Keyword, int(req.Skip), int(req.Count))
-	if err != nil {
-		return nil, err
-	}
 	if err != nil {
 		return nil, err
 	}

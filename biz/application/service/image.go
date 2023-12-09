@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/apache/rocketmq-client-go/v2"
-
 	imagemapper "github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/image"
 
 	"github.com/google/wire"
@@ -19,7 +17,6 @@ type IImageService interface {
 
 type ImageService struct {
 	ImageModel imagemapper.IMongoMapper
-	MqProducer rocketmq.Producer
 }
 
 var ImageSet = wire.NewSet(

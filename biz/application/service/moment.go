@@ -5,9 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/apache/rocketmq-client-go/v2"
-	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/bytedance/sonic"
 	"github.com/google/wire"
 	"github.com/samber/lo"
 	"github.com/xh-polaris/gopkg/pagination/esp"
@@ -39,7 +36,6 @@ type MomentService struct {
 	MomentEsMapper    moment.IEsMapper
 	ImageMapper       image.IMongoMapper
 	Redis             *redis.Redis
-	MqProducer        rocketmq.Producer
 }
 
 var MomentSet = wire.NewSet(
@@ -146,14 +142,6 @@ func (s *MomentService) CreateMoment(ctx context.Context, req *content.CreateMom
 
 	resp.MomentId = data.ID.Hex()
 
-	//发送使用url信息
-	//var urls []url.URL
-	//for _, u := range m.Photos {
-	//	sendUrl, _ := url.Parse(u)
-	//	urls = append(urls, *sendUrl)
-	//}
-	//go s.SendDelayMessage(urls)
-
 	//小鱼干奖励
 	t, err := s.Redis.GetCtx(ctx, "contentTimes"+m.UserId)
 	if err != nil {
@@ -235,15 +223,6 @@ func (s *MomentService) UpdateMoment(ctx context.Context, req *content.UpdateMom
 	if err != nil {
 		return nil, err
 	}
-
-	//发送使用url信息
-	//var urls []url.URL
-	//for _, u := range m.Photos {
-	//	sendUrl, _ := url.Parse(u)
-	//	urls = append(urls, *sendUrl)
-	//}
-	//go s.SendDelayMessage(urls)
-
 	return &content.UpdateMomentResp{}, nil
 }
 
@@ -253,22 +232,4 @@ func (s *MomentService) DeleteMoment(ctx context.Context, req *content.DeleteMom
 		return nil, err
 	}
 	return &content.DeleteMomentResp{}, nil
-}
-
-func (s *MomentService) SendDelayMessage(message interface{}) {
-	json, _ := sonic.Marshal(message)
-	msg := &mqprimitive.Message{
-		Topic: "sts_used_url",
-		Body:  json,
-	}
-
-	res, err := s.MqProducer.SendSync(context.Background(), msg)
-	if err != nil || res.Status != mqprimitive.SendOK {
-		for i := 0; i < 2; i++ {
-			res, err := s.MqProducer.SendSync(context.Background(), msg)
-			if err == nil && res.Status == mqprimitive.SendOK {
-				break
-			}
-		}
-	}
 }

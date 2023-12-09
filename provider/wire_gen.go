@@ -17,7 +17,6 @@ import (
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/moment"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/plan"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/post"
-	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mq"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/stores/redis"
 )
 
@@ -30,19 +29,13 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 	}
 	iMongoMapper := cat.NewMongoMapper(configConfig)
 	iEsMapper := cat.NewEsMapper(configConfig)
-	producer, err := mq.NewMqProducer(configConfig)
-	if err != nil {
-		return nil, err
-	}
 	catService := &service.CatService{
 		CatMongoMapper: iMongoMapper,
 		CatEsMapper:    iEsMapper,
-		MqProducer:     producer,
 	}
 	imageIMongoMapper := image.NewMongoMapper(configConfig)
 	imageService := &service.ImageService{
 		ImageModel: imageIMongoMapper,
-		MqProducer: producer,
 	}
 	momentIMongoMapper := moment.NewMongoMapper(configConfig)
 	momentIEsMapper := moment.NewEsMapper(configConfig)
@@ -53,7 +46,6 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		MomentEsMapper:    momentIEsMapper,
 		ImageMapper:       imageIMongoMapper,
 		Redis:             redisRedis,
-		MqProducer:        producer,
 	}
 	postIMongoMapper := post.NewMongoMapper(configConfig)
 	postIEsMapper := post.NewEsMapper(configConfig)
@@ -62,7 +54,6 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		PostMongoMapper: postIMongoMapper,
 		PostEsMapper:    postIEsMapper,
 		Redis:           redisRedis,
-		MqProducer:      producer,
 	}
 	planIMongoMapper := plan.NewMongoMapper(configConfig)
 	planIEsMapper := plan.NewEsMapper(configConfig)
@@ -73,7 +64,6 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		PlanEsMapper:      planIEsMapper,
 		DonateMongoMapper: donateIMongoMapper,
 		FishMongoMapper:   fishIMongoMapper,
-		MqProducer:        producer,
 	}
 	contentServerImpl := &adaptor.ContentServerImpl{
 		Config:        configConfig,

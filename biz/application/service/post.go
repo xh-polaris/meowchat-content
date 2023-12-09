@@ -5,9 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/apache/rocketmq-client-go/v2"
-	mqprimitive "github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/bytedance/sonic"
 	"github.com/google/wire"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
@@ -36,7 +33,6 @@ type PostService struct {
 	PostMongoMapper post.IMongoMapper
 	PostEsMapper    post.IEsMapper
 	Redis           *redis.Redis
-	MqProducer      rocketmq.Producer
 }
 
 var PostSet = wire.NewSet(
@@ -58,12 +54,6 @@ func (s *PostService) CreatePost(ctx context.Context, req *content.CreatePostReq
 		return nil, err
 	}
 	resp.PostId = p.ID.Hex()
-
-	//发送使用url信息
-	//var urls []url.URL
-	//u, _ := url.Parse(req.CoverUrl)
-	//urls = append(urls, *u)
-	//go s.SendDelayMessage(urls)
 
 	//小鱼干奖励
 	data, err := s.Redis.GetCtx(ctx, "contentTimes"+req.UserId)
@@ -155,12 +145,6 @@ func (s *PostService) UpdatePost(ctx context.Context, req *content.UpdatePostReq
 		return nil, err
 	}
 
-	//发送使用url信息
-	//var urls []url.URL
-	//u, _ := url.Parse(req.CoverUrl)
-	//urls = append(urls, *u)
-	//go s.SendDelayMessage(urls)
-
 	return &content.UpdatePostResp{}, nil
 }
 
@@ -244,22 +228,4 @@ func (s *PostService) SetOfficial(ctx context.Context, req *content.SetOfficialR
 		return nil, err
 	}
 	return &content.SetOfficialResp{}, nil
-}
-
-func (s *PostService) SendDelayMessage(message interface{}) {
-	json, _ := sonic.Marshal(message)
-	msg := &mqprimitive.Message{
-		Topic: "sts_used_url",
-		Body:  json,
-	}
-
-	res, err := s.MqProducer.SendSync(context.Background(), msg)
-	if err != nil || res.Status != mqprimitive.SendOK {
-		for i := 0; i < 2; i++ {
-			res, err := s.MqProducer.SendSync(context.Background(), msg)
-			if err == nil && res.Status == mqprimitive.SendOK {
-				break
-			}
-		}
-	}
 }

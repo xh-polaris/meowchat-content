@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/google/wire"
 	"github.com/xh-polaris/gopkg/pagination/esp"
 	"github.com/xh-polaris/gopkg/pagination/mongop"
@@ -41,7 +40,6 @@ type PlanService struct {
 	PlanEsMapper      plan.IEsMapper
 	DonateMongoMapper donate.IMongoMapper
 	FishMongoMapper   fish.IMongoMapper
-	MqProducer        rocketmq.Producer
 }
 
 var PlanSet = wire.NewSet(
