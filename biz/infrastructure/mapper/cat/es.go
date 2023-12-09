@@ -14,7 +14,9 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortorder"
 	"github.com/mitchellh/mapstructure"
+	"github.com/zeromicro/go-zero/core/trace"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	oteltrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
@@ -50,6 +52,10 @@ func NewEsMapper(config *config.Config) IEsMapper {
 }
 
 func (m *EsMapper) Search(ctx context.Context, communityId, keyword string, skip, count int) ([]*Cat, int64, error) {
+	ctx, span := trace.TracerFromContext(ctx).Start(ctx, "elasticsearch/Search", oteltrace.WithTimestamp(time.Now()), oteltrace.WithSpanKind(oteltrace.SpanKindClient))
+	defer func() {
+		span.End(oteltrace.WithTimestamp(time.Now()))
+	}()
 	res, err := m.es.Search().From(skip).Size(count).Index(m.indexName).Request(&search.Request{
 		Query: &types.Query{
 			Bool: &types.BoolQuery{

@@ -14,6 +14,8 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/xh-polaris/gopkg/pagination"
 	"github.com/xh-polaris/gopkg/pagination/esp"
+	"github.com/zeromicro/go-zero/core/trace"
+	oteltrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/consts"
@@ -54,6 +56,10 @@ func NewEsMapper(config *config.Config) IEsMapper {
 }
 
 func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter esp.EsCursor) ([]*Plan, int64, error) {
+	ctx, span := trace.TracerFromContext(ctx).Start(ctx, "elasticsearch/Search", oteltrace.WithTimestamp(time.Now()), oteltrace.WithSpanKind(oteltrace.SpanKindClient))
+	defer func() {
+		span.End(oteltrace.WithTimestamp(time.Now()))
+	}()
 	p := esp.NewEsPaginator(pagination.NewRawStore(sorter), popts)
 	s, sa, err := p.MakeSortOptions(ctx)
 	if err != nil {
@@ -125,6 +131,10 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 }
 
 func (m *EsMapper) CountWithQuery(ctx context.Context, query []types.Query, fopts *FilterOptions) (int64, error) {
+	ctx, span := trace.TracerFromContext(ctx).Start(ctx, "elasticsearch/Conut", oteltrace.WithTimestamp(time.Now()), oteltrace.WithSpanKind(oteltrace.SpanKindClient))
+	defer func() {
+		span.End(oteltrace.WithTimestamp(time.Now()))
+	}()
 	f := makeEsFilter(fopts)
 	res, err := m.es.Count().Index(m.indexName).Request(&count.Request{
 		Query: &types.Query{
