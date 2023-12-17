@@ -65,13 +65,18 @@ func NewContentServerImpl() (*adaptor.ContentServerImpl, error) {
 		DonateMongoMapper: donateIMongoMapper,
 		FishMongoMapper:   fishIMongoMapper,
 	}
+	incentiveService := &service.IncentiveService{
+		Config: configConfig,
+		Redis:  redisRedis,
+	}
 	contentServerImpl := &adaptor.ContentServerImpl{
-		Config:        configConfig,
-		CatService:    catService,
-		ImageService:  imageService,
-		MomentService: momentService,
-		PostService:   postService,
-		PlanService:   planService,
+		Config:           configConfig,
+		CatService:       catService,
+		ImageService:     imageService,
+		MomentService:    momentService,
+		PostService:      postService,
+		PlanService:      planService,
+		IncentiveService: incentiveService,
 	}
 	return contentServerImpl, nil
 }

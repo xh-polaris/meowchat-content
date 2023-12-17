@@ -2,6 +2,7 @@ package provider
 
 import (
 	"github.com/google/wire"
+
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/cat"
 	"github.com/xh-polaris/meowchat-content/biz/infrastructure/mapper/donate"
@@ -27,6 +28,7 @@ var ApplicationSet = wire.NewSet(
 	service.MomentSet,
 	service.PostSet,
 	service.PlanSet,
+	service.IncentiveSet,
 )
 
 var InfrastructureSet = wire.NewSet(

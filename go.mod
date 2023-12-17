@@ -15,9 +15,10 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/samber/lo v1.38.1
 	github.com/xh-polaris/gopkg v0.0.0-20231013165226-76f4d7108b9d
-	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231203175527-87a00e851322
+	github.com/xh-polaris/service-idl-gen-go v0.0.0-20231217154332-91efd6d97e81
 	github.com/zeromicro/go-zero v1.6.0
 	go.mongodb.org/mongo-driver v1.12.1
+	go.opentelemetry.io/otel/trace v1.19.0
 	google.golang.org/grpc v1.59.0
 )
 
@@ -87,7 +88,6 @@ require (
 	go.opentelemetry.io/otel/exporters/zipkin v1.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.19.0 // indirect
-	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect

@@ -11,11 +11,20 @@ import (
 
 type ContentServerImpl struct {
 	*config.Config
-	CatService    service.ICatService
-	ImageService  service.IImageService
-	MomentService service.IMomentService
-	PostService   service.IPostService
-	PlanService   service.IPlanService
+	CatService       service.ICatService
+	ImageService     service.IImageService
+	MomentService    service.IMomentService
+	PostService      service.IPostService
+	PlanService      service.IPlanService
+	IncentiveService service.IIncentiveService
+}
+
+func (s *ContentServerImpl) CheckIn(ctx context.Context, req *content.CheckInReq) (res *content.CheckInResp, err error) {
+	return s.IncentiveService.CheckIn(ctx, req)
+}
+
+func (s *ContentServerImpl) GetMission(ctx context.Context, req *content.GetMissionReq) (res *content.GetMissionResp, err error) {
+	return s.IncentiveService.GetMission(ctx, req)
 }
 
 func (s *ContentServerImpl) CountDonateByPlan(ctx context.Context, req *content.CountDonateByPlanReq) (res *content.CountDonateByPlanResp, err error) {
