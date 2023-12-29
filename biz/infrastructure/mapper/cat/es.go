@@ -56,7 +56,7 @@ func (m *EsMapper) Search(ctx context.Context, communityId, keyword string, skip
 	defer func() {
 		span.End(oteltrace.WithTimestamp(time.Now()))
 	}()
-	res, err := m.es.Search().From(skip).Size(count).Index(m.indexName).Request(&search.Request{
+	res, err := m.es.Search().Index(m.indexName).Request(&search.Request{
 		Query: &types.Query{
 			Bool: &types.BoolQuery{
 				Must: []types.Query{
@@ -88,7 +88,7 @@ func (m *EsMapper) Search(ctx context.Context, communityId, keyword string, skip
 				},
 			},
 		},
-	}).Do(ctx)
+	}).From(skip).Size(count).Do(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
