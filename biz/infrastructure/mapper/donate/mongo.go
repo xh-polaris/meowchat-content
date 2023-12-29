@@ -2,6 +2,7 @@ package donate
 
 import (
 	"context"
+	"github.com/samber/lo"
 	"sync"
 	"time"
 
@@ -80,9 +81,7 @@ func (m *MongoMapper) FindManyByUserId(ctx context.Context, id string, popts *pa
 
 	// 如果是反向查询，反转数据
 	if *popts.Backward {
-		for i := 0; i < len(data)/2; i++ {
-			data[i], data[len(data)-i-1] = data[len(data)-i-1], data[i]
-		}
+		lo.Reverse(data)
 	}
 	if len(data) > 0 {
 		err = p.StoreCursor(ctx, data[0], data[len(data)-1])

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/samber/lo"
 	"log"
 	"net/http"
 	"time"
@@ -86,7 +87,7 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 	if err != nil {
 		return nil, 0, err
 	}
-	res, err := m.es.Search().From(int(*popts.Offset)).Size(int(*popts.Limit)).Index(m.indexName).Request(&search.Request{
+	res, err := m.es.Search().Index(m.indexName).Request(&search.Request{
 		Query: &types.Query{
 			Bool: &types.BoolQuery{
 				Must:   query,
@@ -95,7 +96,7 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 		},
 		SearchAfter: sa,
 		Sort:        s,
-	}).Do(ctx)
+	}).Size(int(*popts.Limit)).Do(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -132,9 +133,7 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 	}
 	// 如果是反向查询，反转数据
 	if *popts.Backward {
-		for i := 0; i < len(posts)/2; i++ {
-			posts[i], posts[len(posts)-i-1] = posts[len(posts)-i-1], posts[i]
-		}
+		lo.Reverse(posts)
 	}
 	if len(posts) > 0 {
 		err = p.StoreCursor(ctx, posts[0], posts[len(posts)-1])

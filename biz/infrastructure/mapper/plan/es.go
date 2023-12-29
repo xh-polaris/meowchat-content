@@ -66,7 +66,7 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 		return nil, 0, err
 	}
 	f := makeEsFilter(fopts)
-	res, err := m.es.Search().From(int(*popts.Offset)).Size(int(*popts.Limit)).Index(m.indexName).Request(&search.Request{
+	res, err := m.es.Search().Index(m.indexName).Request(&search.Request{
 		Query: &types.Query{
 			Bool: &types.BoolQuery{
 				Must:   query,
@@ -75,7 +75,7 @@ func (m *EsMapper) Search(ctx context.Context, query []types.Query, fopts *Filte
 		},
 		Sort:        s,
 		SearchAfter: sa,
-	}).Do(ctx)
+	}).Size(int(*popts.Limit)).Do(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
